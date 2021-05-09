@@ -1,6 +1,7 @@
 plugins {
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
+    id 'org.jetbrains.kotlin.jvm' version '1.5.0'
+    id 'com.diffplug.spotless' version '5.5.0'
 }
 application {
     mainClass = 'MainKt'
@@ -13,10 +14,9 @@ dependencies {
 
 }
 
-compileKotlin {
-    kotlinOptions.jvmTarget = '1.6'
-}
-
-compileTestKotlin {
-    kotlinOptions.jvmTarget = '1.6'
+spotless {
+    kotlin {
+        ktfmt()
+        endWithNewline()
+    }
 }

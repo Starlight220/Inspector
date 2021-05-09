@@ -8,32 +8,24 @@ fun main(args: Array<String>) {
 
   File(args[0])
     .walkDir { extension == "rst" }
-    .flatMap { it.findRLIs() }
+    .flatMap { it.findRlis() }
     .forEach { it.status() }
 
-  File("report.md").writeText(report.toString())
-
+  with(report.toString()) {
+    File("report.md").writeText(this)
+    println(this)
+  }
 }
 
-const val latestVersion = "v2021.3.1"
-const val rliRegex =
-  """\.\. (?:rli)|(?:remoteliteralinclude):: https:\/\/raw\.githubusercontent\.com\/wpilibsuite\/allwpilib\/(v\d{4}\.\d\.\d(?:-beta-\d)?)\/([\/\w.]+)\r?\n.*\r?\n[ ]{9}:lines: (\d*-\d*)"""
-const val baseURL = "https://raw.githubusercontent.com/wpilibsuite/allwpilib"
-
-fun File.findRLIs(): Sequence<LocatedRli> {
-  val text = readText()
-  return Regex(rliRegex)
-    .findAll(text)
-    .map { buildRli(it, name, text) }
-    .filterNotNull()
-}
-
-fun buildRli(result: MatchResult, file: String, text: String): LocatedRli? {
-  val line = text.indexToLineNumber(result.range.first)
-  val (version, path, lines) = result.destructured
+fun buildRli(result: MatchResult, file: RliFile): LocatedRli? {
+  assert(result.value matches rliRegex.toRegex())
+  val idxRange = result.groups[1]?.range ?: IntRange.EMPTY
+  val (version, path, _lines) = result.destructured
+  val lines = _lines.toLineRange()
+  val loc = Location(file, idxRange)
   if (version == latestVersion) {
-    report.upToDate(url = path, path = file, line)
+    report.upToDate(url = path, lines, loc)
     return null
   }
-  return LocatedRli(Location(file, line), Rli("$baseURL/$version/$path", lines.toLineRange()))
+  return loc to Rli("$baseURL/$version/$path", lines)
 }
