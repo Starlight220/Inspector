@@ -1,6 +1,5 @@
 FROM wpilib/ubuntu-base:18.04
 
-RUN <ls -a .>
-COPY . /
+COPY . /inspect_rli/
 
-ENTRYPOINT ["/gradlew run"]
+ENTRYPOINT ["/inspect_rli/gradlew run"]
