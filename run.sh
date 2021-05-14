@@ -1,3 +1,3 @@
 #!/bin/bash
 
-./gradlew run
+/inspect_rli/gradlew run
