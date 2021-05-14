@@ -1,13 +1,13 @@
+package io.starlight.rli
+
 import java.io.File
 
 class RliFile(private val file: File) {
-  constructor(path: String) : this(File(path))
-
   private var content: String = file.readText()
   private var offset: Int = 0
 
   fun replaceRange(range: IntRange, replacement: String) {
-    val offsetRange = range.move(offset)
+    val offsetRange = IntRange(range.first + offset, range.last + offset)
     val newContent = content.replaceRange(offsetRange, replacement)
 
     offset += newContent.length - content.length
@@ -17,17 +17,11 @@ class RliFile(private val file: File) {
 
   fun <R> use(const: (String) -> R) = const(content)
 
-  fun findRlis(): Sequence<LocatedRli> {
-    return Regex(rliRegex)
-      .findAll(content)
-      .map { buildRli(it, this) }
-      .filterNotNull()
-  }
+  fun findRlis(): Sequence<LocatedRli> =
+      Constants.rliRegex.findAll(content).map { buildRli(it, this) }.filterNotNull()
 
-  override fun toString(): String = file.name
+  override fun toString(): String = file.toRelativeString(Constants.root)
 }
-
-fun IntRange.move(offset: Int): IntRange = IntRange(start + offset, endInclusive + offset)
 
 fun File.walkDir(predicate: File.() -> Boolean): Set<RliFile> {
   return walk().filter(predicate).map(::RliFile).toSet()
