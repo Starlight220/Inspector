@@ -24,7 +24,9 @@ object Constants {
   val latestVersion by Input()
 
   val rliRegex by lazy {
-    """$rliHeaderRegex ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/([/\w.]+)\r?\n.*$rliLinesRegex""".toRegex()
+    val r = """$rliHeaderRegex ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/([/\w.]+)\r?\n.*$rliLinesRegex""".toRegex()
+    println(r)
+    r
   }
 
   override fun toString(): String {
