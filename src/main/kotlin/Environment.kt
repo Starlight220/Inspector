@@ -53,5 +53,5 @@ private fun getProperty(name: String): String? =
     if (env != null) {
       env[name]
     } else {
-      System.getProperty("INPUT_$name")
+      System.getenv("INPUT_${name.uppercase()}")
     }

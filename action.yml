@@ -3,3 +3,17 @@ description: Updates all outdated RLIs in the Sphinx project.
 runs:
   using: 'docker'
   image: 'Dockerfile'
+inputs:
+  root:
+    description: 'Root Directory of Sphinx project'
+    required: true
+    default: '$GITHUB_WORKSPACE'
+  latestVersion:
+    description: 'Version of RLIs to enforce'
+    required: true
+  baseUrl:
+    description: 'Base URL of all RLIs'
+    required: true
+  versionScheme:
+    description: 'A regex that all RLI versions match'
+    required: true
