@@ -17,3 +17,10 @@ inputs:
   versionScheme:
     description: 'A regex that all RLI versions match'
     required: true
+outputs:
+  report:
+    description: 'Full Report; written to the `report.md` file, console, and this output.'
+  report-file-path:
+    description: 'Full path to the `report.md` file.'
+  needs-manual:
+    description: '`true` if there are RLIs that need manual updating, `false` otherwise.'

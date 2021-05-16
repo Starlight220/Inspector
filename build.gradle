@@ -16,7 +16,19 @@ dependencies {
 
 spotless {
     kotlin {
-        ktfmt()
+        ktfmt('0.25').kotlinlangStyle()
         endWithNewline()
     }
+}
+
+task cleanup(type: Delete) {
+    if (project.hasProperty("CI") && project.property("CI") == true) {
+        return
+    }
+    delete 'outputs.inspect_rli.json'
+    delete 'report.md'
+    delete 'new.tmp'
+    delete 'old.tmp'
+
+    tasks.named('run').get() dependsOn 'cleanup'
 }
