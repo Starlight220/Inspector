@@ -57,10 +57,12 @@ object Report {
   """.trimMargin()
 
     private var needsManual by Output<Boolean>("needs-manual")
+    private var isUpToDate by Output<Boolean>("up-to-date")
     private var reportFilePath by Output<String>("report-file-path")
     private var report by Output
     operator fun invoke() {
         needsManual = invalid.isNotEmpty()
+        isUpToDate = !needsManual && outdated.isEmpty()
         reportFilePath = Constants.reportFile.canonicalPath
         report = toString()
         Constants.reportFile.writeText(report)

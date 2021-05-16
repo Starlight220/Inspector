@@ -24,3 +24,5 @@ outputs:
     description: 'Full path to the `report.md` file.'
   needs-manual:
     description: '`true` if there are RLIs that need manual updating, `false` otherwise.'
+  up-to-date:
+    description: '`true` if everything is up-to-date, `false` otherwise.'
