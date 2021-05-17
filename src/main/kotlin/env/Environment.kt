@@ -112,4 +112,4 @@ fun setOutput(name: String, value: String): Unit {
  * Source: https://github.community/t/set-output-truncates-multiline-strings/16852/5
  */
 fun String.escaped() =
-    replace('%', 0x25.toChar()).replace('\n', 0x0A.toChar()).replace('\r', 0x0D.toChar())
+    replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
