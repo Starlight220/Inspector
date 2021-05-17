@@ -9,4 +9,4 @@ echo "INPUT_BASEURL=$INPUT_BASEURL)"
 echo "INPUT_LATESTVERSION=$INPUT_LATESTVERSION)"
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE)"
 
-/inspect_rli/gradlew run
+/inspect_rli/gradlew run -q
