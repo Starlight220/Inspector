@@ -101,7 +101,7 @@ fun setOutput(name: String, value: String): Unit {
     else {
         val cmd = "::set-output name=${name.escaped()}::${value.escaped()}"
         println(cmd)
-        Runtime.getRuntime().exec(cmd)
+//        Runtime.getRuntime().exec(cmd)
     }
 }
 
