@@ -40,6 +40,10 @@ object Report {
 
     override fun toString(): String =
         """
+    |# Inspector Report
+    |
+    |***
+    |
     |### Up To Date
     |```
     |${upToDate.joinToString("\n")}

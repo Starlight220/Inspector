@@ -3,6 +3,8 @@
 build/
 .gradle/
 
-report.md # perhaps remove this later?
+/report.md
 *.inspect_rli.json # same here
 *.tmp
+/inputs.inspect_rli.json
+/outputs.inspect_rli.json
