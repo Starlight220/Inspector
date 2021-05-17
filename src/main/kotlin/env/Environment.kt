@@ -73,8 +73,17 @@ private fun getInput(name: String): String? =
 private fun setOutput(name: String, value: String): Unit {
     if (IS_LOCAL) env[name] = value
     else {
-        val cmd = "echo \"::set-output name=${name}::${value}\""
+        val cmd = "echo \"::set-output name=${name.escaped()}::${value.escaped()}\""
         System.err.println(cmd)
         Runtime.getRuntime().exec(cmd)
     }
 }
+
+/**
+ * GitHub Actions doesn't like multiline strings, so this escapes the newlines into something that
+ * GH Actions accepts.
+ *
+ * Source: https://github.community/t/set-output-truncates-multiline-strings/16852/5
+ */
+fun String.escaped() =
+    replace('%', 0x25.toChar()).replace('\n', 0x0A.toChar()).replace('\r', 0x0D.toChar())
