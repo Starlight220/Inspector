@@ -99,8 +99,8 @@ fun getInput(name: String): String? =
 fun setOutput(name: String, value: String): Unit {
     if (IS_LOCAL) env[name] = value
     else {
-        val cmd = "echo \"::set-output name=${name.escaped()}::${value.escaped()}\""
-        System.err.println(cmd)
+        val cmd = "::set-output name=${name.escaped()}::${value.escaped()}"
+        println(cmd)
         Runtime.getRuntime().exec(cmd)
     }
 }
