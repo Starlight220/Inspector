@@ -72,5 +72,7 @@ private fun getInput(name: String): String? =
 
 private fun setOutput(name: String, value: String): Unit {
     if (IS_LOCAL) env[name] = value
-    else Runtime.getRuntime().exec("echo \"::set-output name=${name}::${value}")
+    else {
+        Runtime.getRuntime().exec("echo \"::set-output name=${name}::${value}\"")
+    }
 }
