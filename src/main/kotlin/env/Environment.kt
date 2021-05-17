@@ -6,6 +6,14 @@ import kotlin.reflect.KProperty
 
 private val IDENTITY: (String) -> String = { it }
 
+/**
+ * Property Delegate type for Action Inputs.
+ *
+ * @param name the property name. Defaults to the property name.
+ * @param mapper a function that converts the object to a String. Defaults to [toString].
+ *
+ * If the property name is identical to the input name, and the property is a String; use the Companion object for a cleaner usage syntax.
+ */
 open class Input<T>(private val name: String? = null, private val mapper: (String) -> T) :
     ReadOnlyProperty<Any, T> {
     companion object : Input<String>(null, IDENTITY) {
@@ -28,6 +36,14 @@ open class Input<T>(private val name: String? = null, private val mapper: (Strin
     }
 }
 
+/**
+ * Property Delegate type for Action Outputs.
+ *
+ * @param name the property name. Defaults to the property name.
+ * @param mapper a function that converts the object to a String. Defaults to [toString].
+ *
+ * If the property name is identical to the input name, and the property is a String; use the Companion object for a cleaner usage syntax.
+ */
 open class Output<T>(
     private val name: String? = null,
     private val mapper: (T) -> String = { it.toString() }
@@ -63,14 +79,24 @@ open class Output<T>(
     }
 }
 
-private fun getInput(name: String): String? =
+/**
+ * Get an input for this action.
+ *
+ * This is a low-level function. Use the [Input] delegate type instead.
+ */
+fun getInput(name: String): String? =
     if (IS_LOCAL) {
         env[name]
     } else {
         System.getenv("INPUT_${name.uppercase()}")
     }
 
-private fun setOutput(name: String, value: String): Unit {
+/**
+ * Set an output for this action.
+ *
+ * This is a low-level function. Use the [Output] delegate type instead.
+ */
+fun setOutput(name: String, value: String): Unit {
     if (IS_LOCAL) env[name] = value
     else {
         val cmd = "echo \"::set-output name=${name.escaped()}::${value.escaped()}\""
