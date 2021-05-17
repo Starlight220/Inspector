@@ -35,4 +35,4 @@ internal data class Env(
     }
 }
 
-internal val env: Env = Json.decodeFromString(File(envFilePath).readText())
+internal val env: Env by lazy { Json.decodeFromString(File(envFilePath).readText()) }
