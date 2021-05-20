@@ -19,24 +19,9 @@ object Report {
             Constants.newTmpFile.writeText(diff.new.response)
 
             invalid.push(
-                "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff${calculateDiff()}```\n"
+                "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff\n${buildDiffBlock(diff)}\n```\n"
             )
         }
-
-    private fun calculateDiff(): String =
-        Runtime.getRuntime()
-            .exec(
-                Constants.run {
-                    "$diffCommand ${oldTmpFile.canonicalPath} ${newTmpFile.canonicalPath}"
-                }
-            )
-            .inputStream
-            .bufferedReader()
-            .readText()
-            .split(Constants.diffSplitRegex)
-            .asSequence()
-            .drop(1) // drop header
-            .joinToString("\n")
 
     override fun toString(): String =
         """

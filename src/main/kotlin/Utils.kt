@@ -29,7 +29,7 @@ data class Rli(val url: String, val lines: IntRange) {
         URL(Constants.baseUrl + url)
             .readText()
             .splitToSequence('\n')
-            .filterIndexed { i, _ -> i in lines }
+            .filterIndexed { i, _ -> i + 1 in lines }
             .joinToString(separator = "\n")
     }
 }
