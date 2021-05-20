@@ -6,6 +6,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+/** Whether the program is running on a local machine or on a GitHub Actions runner. */
 val IS_LOCAL = System.getenv("CI")?.toBooleanStrictOrNull()?.not() ?: true
 
 // for local testing ONLY

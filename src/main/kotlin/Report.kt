@@ -19,7 +19,7 @@ object Report {
             Constants.newTmpFile.writeText(diff.new.response)
 
             invalid.push(
-                "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff\n${calculateDiff()}\n```\n"
+                "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff${calculateDiff()}```\n"
             )
         }
 
@@ -45,18 +45,32 @@ object Report {
     |***
     |
     |### Up To Date
+    |
+    |<details>
+    |
     |```
     |${upToDate.joinToString("\n")}
     |```
     |
+    |</details>
+    |
     |### Outdated - Automatically Fixed
+    |
+    |<details>
+    |
     |```
     |${outdated.joinToString("\n")}
     |```
     |
+    |</details>
+    |
     |### Invalid - Manual Intervention Needed
     |
+    |<details>
+    |
     |${invalid.joinToString("\n")}
+    |
+    |</details>
     |
   """.trimMargin()
 

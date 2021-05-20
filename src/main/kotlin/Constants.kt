@@ -17,7 +17,7 @@ object Constants {
     val newTmpFile = File(newTmpFilePath)
     val root by Input(mapper = ::File)
 
-    const val diffCommand: String = "git diff --no-index -- "
+    const val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
     val diffSplitRegex = """@@ [-]?\d+,\d+ [+]?\d+,\d+ @@""".toRegex()
 
     val baseUrl by Input

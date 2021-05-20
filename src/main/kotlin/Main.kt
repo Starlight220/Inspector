@@ -1,10 +1,6 @@
 package io.starlight.rli
 
-import io.starlight.rli.env.setOutput
-
 fun main() {
-    setOutput("test", "TEST")
-
     Constants.root.walkDir { extension == "rst" }.flatMap { it.findRlis() }.forEach { it.status() }
 
     Report()

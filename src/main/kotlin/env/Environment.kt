@@ -12,12 +12,14 @@ private val IDENTITY: (String) -> String = { it }
  * @param name the property name. Defaults to the property name.
  * @param mapper a function that converts the object to a String. Defaults to [toString].
  *
- * If the property name is identical to the input name, and the property is a String; use the Companion object for a cleaner usage syntax.
+ * If the property name is identical to the input name, and the property is a String; use the
+ * Companion object for a cleaner usage syntax.
  */
 open class Input<T>(private val name: String? = null, private val mapper: (String) -> T) :
     ReadOnlyProperty<Any, T> {
     companion object : Input<String>(null, IDENTITY) {
-        operator fun <T> invoke(name: String) = Input(name, IDENTITY)
+        /** Get an [Input] String property delegate with the given name. */
+        operator fun invoke(name: String) = Input(name, IDENTITY)
     }
 
     @Throws(IllegalStateException::class)
@@ -42,7 +44,8 @@ open class Input<T>(private val name: String? = null, private val mapper: (Strin
  * @param name the property name. Defaults to the property name.
  * @param mapper a function that converts the object to a String. Defaults to [toString].
  *
- * If the property name is identical to the input name, and the property is a String; use the Companion object for a cleaner usage syntax.
+ * If the property name is identical to the input name, and the property is a String; use the
+ * Companion object for a cleaner usage syntax.
  */
 open class Output<T>(
     private val name: String? = null,
@@ -98,11 +101,7 @@ fun getInput(name: String): String? =
  */
 fun setOutput(name: String, value: String): Unit {
     if (IS_LOCAL) env[name] = value
-    else {
-        val cmd = "::set-output name=${name.escaped()}::${value.escaped()}"
-        println(cmd)
-//        Runtime.getRuntime().exec(cmd)
-    }
+    else println("::set-output name=${name.escaped()}::${value.escaped()}")
 }
 
 /**
@@ -111,5 +110,4 @@ fun setOutput(name: String, value: String): Unit {
  *
  * Source: https://github.community/t/set-output-truncates-multiline-strings/16852/5
  */
-fun String.escaped() =
-    replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
+fun String.escaped() = replace("%", "%25").replace("\n", "%0A").replace("\r", "%0D")
