@@ -15,8 +15,8 @@ object Report {
     private val invalid = LinkedList<String>()
     fun invalid(obj: RliStatus.Invalid) =
         with(obj) {
-            Constants.oldTmpFile.writeText(diff.old.response)
-            Constants.newTmpFile.writeText(diff.new.response)
+            Constants.oldTmpFile.writeText(diff.old.response + "\n")
+            Constants.newTmpFile.writeText(diff.new.response + "\n")
 
             invalid.push(
                 "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff\n${buildDiffBlock(diff)}\n```\n"
