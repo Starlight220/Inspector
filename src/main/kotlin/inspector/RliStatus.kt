@@ -22,9 +22,7 @@ sealed class RliStatus(val rli: Rli, val location: Location) {
 val LocatedRli.status: RliStatus
     get() =
         with(second) {
-            val new =
-                Rli(url.replace(Regex(Constants.versionScheme), Constants.latestVersion), lines)
-            val diff = this diff new
+            val diff = this diff this.withLatest
             if (diff == null) {
                 RliStatus.Valid(this@status)
             } else {

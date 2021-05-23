@@ -12,21 +12,17 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
     }
 }
 
-data class Rli(val url: String, val lines: LineRange) {
+data class Rli(val version: String, val url: String, val lines: LineRange) {
+    val versionedUrl: String = """$version/$url"""
+    val fullUrl: String = """${Constants.baseUrl}$version/$url"""
     val response: String by lazy {
-        URL(Constants.baseUrl + url)
+        URL(fullUrl)
             .readText()
             .lineSequence()
             .filterIndexed { i, _ -> i + 1 in lines }
-            //            .map {
-            //                it.ifBlank {
-            //                    val s = it.replace(" ", "%")
-            //                    System.err.println("$url:$lines > $s")
-            //                    s
-            //                }
-            //            }
             .joinToString(separator = "\n")
     }
+    val withLatest by lazy { copy(version = Constants.latestVersion) }
 }
 
 typealias LocatedRli = Pair<Location, Rli>

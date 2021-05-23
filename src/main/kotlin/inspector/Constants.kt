@@ -23,8 +23,8 @@ object Constants {
     const val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
     val diffSplitRegex = """@@ [-]?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
-    /** Base URL for all RLIs */
-    val baseUrl by Input
+    /** Base URL for all RLIs. Contains terminating `/`. */
+    val baseUrl by Input { str -> if (str.endsWith('/')) str else "$str/" }
 
     /** Version Regex */
     val versionScheme by Input

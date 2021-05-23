@@ -1,5 +1,7 @@
 package io.starlight.inspector
 
+import kotlin.streams.asSequence
+
 fun main() {
     /*
     Process:
@@ -12,7 +14,12 @@ fun main() {
                 - if identical, autofix (**outdated**)
                 - else, require manual attention (**invalid**)
      */
-    Constants.root.walkDir { extension == "rst" }.flatMap { it.findRlis() }.forEach { it.status() }
+    Constants.root
+        .walkDir { extension == "rst" }
+        .map { it.findRlis() }
+        .asSequence()
+        .flatMap { seq -> seq.map { it.status } }
+        .forEach { it() }
 
     Report()
 }

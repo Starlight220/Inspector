@@ -9,22 +9,26 @@ object Report {
     private val invalid = LinkedList<String>()
 
     /** Report an RLI as up-to-date */
-    fun upToDate(url: String, lines: LineRange, loc: Location): Unit =
-        upToDate.push(formatHeader(loc, Rli(url, lines)))
+    fun upToDate(url: String, lines: LineRange, loc: Location) =
+        upToDate.push("${url}#${lines} @ <${loc.file}:${loc.line}>")
 
     /** Report an RLI as outdated and automatically fixed */
-    fun outdated(rli: Rli, location: Location): Unit = outdated.push(formatHeader(location, rli))
+    fun outdated(rli: Rli, location: Location): Unit =
+        outdated.push("${rli.url}#${rli.lines} @ <${location.file}:${location.line}>")
 
     /** Report an RLI as invalid and requires manual attention */
     fun invalid(obj: RliStatus.Invalid) =
         with(obj) {
             invalid.push(
-                "${formatHeader(location, diff.old)}\n```diff\n${buildDiffBlock(diff)}\n```\n"
+                """
+                |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <${location.file}:${location.line}>
+                |```diff
+                |${buildDiffBlock(diff)}
+                |```
+                |
+            """.trimMargin()
             )
         }
-
-    private fun formatHeader(location: Location, rli: Rli) =
-        "> [${rli.url}#${rli.lines}](${Constants.baseUrl}${rli.url}) @ <${location.file}:${location.line}>"
 
     override fun toString(): String =
         """
@@ -72,6 +76,6 @@ object Report {
         reportFilePath = Constants.reportFile.canonicalPath
         report = toString()
         Constants.reportFile.writeText(report)
-        //        println(report)
+        println(report)
     }
 }

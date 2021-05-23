@@ -1,6 +1,8 @@
 package io.starlight.inspector
 
 import java.io.File
+import java.util.HashSet
+import java.util.stream.Stream
 
 /** Represents a file that contains RLIs. */
 class RliFile(private val file: File) {
@@ -48,7 +50,7 @@ class RliFile(private val file: File) {
             Report.upToDate(url, lines, loc)
             return null
         }
-        return loc to Rli("$version/$url", lines)
+        return loc to Rli(version, url, lines)
     }
 
     override fun toString(): String = file.toRelativeString(Constants.root)
@@ -60,5 +62,5 @@ class RliFile(private val file: File) {
  * Searches recursively for files.
  * @see walk
  */
-fun File.walkDir(predicate: File.() -> Boolean): Sequence<RliFile> =
-    walk().filter(predicate).map(::RliFile)
+fun File.walkDir(predicate: File.() -> Boolean): Stream<RliFile> =
+    walk().filterTo(HashSet(), predicate).parallelStream().map(::RliFile)
