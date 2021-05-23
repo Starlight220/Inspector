@@ -1,4 +1,4 @@
-package io.starlight.rli.env
+package io.starlight.env
 
 import java.io.File
 import kotlinx.serialization.Serializable

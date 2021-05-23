@@ -5,7 +5,7 @@ plugins {
     id "com.diffplug.spotless" version "5.12.5"
 }
 
-application.mainClassName = 'io.starlight.rli.MainKt'
+application.mainClassName = 'io.starlight.inspector.MainKt'
 repositories {
     mavenCentral()
 }

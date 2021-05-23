@@ -1,27 +1,30 @@
-package io.starlight.rli
+package io.starlight.inspector
 
-import io.starlight.rli.env.Output
+import io.starlight.env.Output
 import java.util.*
 
 object Report {
     private val upToDate = LinkedList<String>()
-    fun upToDate(url: String, lines: IntRange, loc: Location) =
-        with(loc) { upToDate.push("$url:$lines @ <$file:$line>") }
-
     private val outdated = LinkedList<String>()
-    fun outdated(url: String, lines: IntRange, loc: Location) =
-        with(loc) { outdated.push("$url:$lines @ $file:$line") }
-
     private val invalid = LinkedList<String>()
+
+    /** Report an RLI as up-to-date */
+    fun upToDate(url: String, lines: LineRange, loc: Location): Unit =
+        upToDate.push(formatHeader(loc, Rli(url, lines)))
+
+    /** Report an RLI as outdated and automatically fixed */
+    fun outdated(rli: Rli, location: Location): Unit = outdated.push(formatHeader(location, rli))
+
+    /** Report an RLI as invalid and requires manual attention */
     fun invalid(obj: RliStatus.Invalid) =
         with(obj) {
-            Constants.oldTmpFile.writeText(diff.old.response + "\n")
-            Constants.newTmpFile.writeText(diff.new.response + "\n")
-
             invalid.push(
-                "${diff.old.url}#L${diff.old.lines.first}-L${diff.old.lines.last} @ <${location.file}:${location.line}>\n```diff\n${buildDiffBlock(diff)}\n```\n"
+                "${formatHeader(location, diff.old)}\n```diff\n${buildDiffBlock(diff)}\n```\n"
             )
         }
+
+    private fun formatHeader(location: Location, rli: Rli) =
+        "> [${rli.url}#${rli.lines}](${Constants.baseUrl}${rli.url}) @ <${location.file}:${location.line}>"
 
     override fun toString(): String =
         """
@@ -69,6 +72,6 @@ object Report {
         reportFilePath = Constants.reportFile.canonicalPath
         report = toString()
         Constants.reportFile.writeText(report)
-        println(report)
+        //        println(report)
     }
 }

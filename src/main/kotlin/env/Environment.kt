@@ -1,4 +1,4 @@
-package io.starlight.rli.env
+package io.starlight.env
 
 import kotlin.properties.ReadOnlyProperty
 import kotlin.properties.ReadWriteProperty
