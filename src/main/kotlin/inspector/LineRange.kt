@@ -46,15 +46,13 @@ sealed class LineRange {
         operator fun invoke(s: String): LineRange =
             with(s) {
                 val parts = this.split('-')
-                return when (parts.size) {
-                    1 -> LowerBoundedLineRange(parts[0].toInt())
-                    2 -> {
-                        val start = parts[0].toInt()
-                        val end = parts[1].toInt()
-                        if (start == end) SingletonLineRange(start) else RangedLineRange(start..end)
-                    }
-                    else -> throw NumberFormatException("error in parsing numbers: `$this`")
+                check(parts.size == 2) { "error in parsing numbers: `$this`" }
+                if (parts[1].isBlank()) {
+                    return@with LowerBoundedLineRange(parts[0].toInt())
                 }
+                val start = parts[0].toInt()
+                val end = parts[1].toInt()
+                return if (start == end) SingletonLineRange(start) else RangedLineRange(start..end)
             }
     }
 }

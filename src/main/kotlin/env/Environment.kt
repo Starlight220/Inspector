@@ -100,6 +100,7 @@ fun getInput(name: String): String? =
  * This is a low-level function. Use the [Output] delegate type instead.
  */
 fun setOutput(name: String, value: String): Unit {
+    println("[INFO] Set `$name` to `$value`")
     if (IS_LOCAL) env[name] = value
     else println("::set-output name=${name.escaped()}::${value.escaped()}")
 }

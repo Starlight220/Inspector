@@ -3,6 +3,11 @@ package io.starlight.inspector
 import java.net.URL
 
 data class Location(val file: RliFile, val indexRange: IntRange) {
+    fun compareTo(other: Location): Int {
+        return this.file.compareTo(other.file).takeUnless { it == 0 }
+            ?: this.indexRange.first.compareTo(other.indexRange.first)
+    }
+
     val line by lazy {
         file.use {
             var counter = 1

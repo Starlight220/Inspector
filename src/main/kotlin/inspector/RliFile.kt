@@ -54,6 +54,7 @@ class RliFile(private val file: File) {
     }
 
     override fun toString(): String = file.toRelativeString(Constants.root)
+    operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
 }
 
 /**

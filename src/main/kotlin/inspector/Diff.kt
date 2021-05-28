@@ -33,24 +33,19 @@ fun buildDiffBlock(diff: Diff): String {
                 )
         }
 
-    val block =
-        Runtime.getRuntime()
-            .exec(
-                Constants.run {
-                    "$diffCommand ${oldTmpFile.canonicalPath} ${newTmpFile.canonicalPath}"
-                }
-            )
-            .inputStream
-            .bufferedReader()
-            .readText()
-            .split(Constants.diffSplitRegex)
-            .asSequence()
-            .drop(1) // drop header
-            .flatMap { it.lineSequence() }
-            .filter { it.isNotEmpty() }
-            .map { processLine(it) }
-            .filterNot { it.isNullOrEmpty() }
-            .joinToString("\n")
-
-    return block
+    return Runtime.getRuntime()
+        .exec(
+            Constants.run { "$diffCommand ${oldTmpFile.canonicalPath} ${newTmpFile.canonicalPath}" }
+        )
+        .inputStream
+        .bufferedReader()
+        .readText()
+        .split(Constants.diffSplitRegex)
+        .asSequence()
+        .drop(1) // drop header
+        .flatMap { it.lineSequence() }
+        .filter { it.isNotEmpty() }
+        .map { processLine(it) }
+        .filterNot { it.isNullOrEmpty() }
+        .joinToString("\n")
 }

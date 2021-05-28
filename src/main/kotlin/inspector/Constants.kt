@@ -8,7 +8,7 @@ private const val oldTmpFilePath = "old.tmp"
 private const val newTmpFilePath = "new.tmp"
 
 private const val rliHeaderRegex = """\.\. (?:rli)|(?:remoteliteralinclude)::"""
-private const val rliLinesRegex = """\r?\n[ ]{9}:lines: (\d*-\d*)"""
+private const val rliLinesRegex = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
 /** Constants Namespace */
 object Constants {
