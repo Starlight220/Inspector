@@ -6,6 +6,9 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
             ?: this.indexRange.first.compareTo(other.indexRange.first)
     }
 
+    override fun equals(other: Any?): Boolean = other is Location && this.compareTo(other) == 0
+    override fun hashCode(): Int = 31 * file.hashCode() + indexRange.hashCode()
+
     val line by lazy {
         file.use {
             var counter = 1

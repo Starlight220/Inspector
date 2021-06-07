@@ -5,7 +5,7 @@ import java.util.HashSet
 import java.util.stream.Stream
 
 /** Represents a file that contains RLIs. */
-class RliFile(private val file: File) {
+class RliFile(private val file: File) : Comparable<RliFile> {
     private var content: String = file.readText()
     private var offset: Int = 0
 
@@ -32,8 +32,14 @@ class RliFile(private val file: File) {
     fun <R> use(const: (String) -> R) = const(content)
 
     /** Returns a [Sequence] of RLIs in this file */
-    fun findRlis(): Sequence<LocatedRli> =
-        Constants.rliRegex.findAll(content).map { this.buildRli(it) }.filterNotNull()
+    fun findRlis(): Sequence<LocatedRli> {
+        val matches = Constants.rliRegex.findAll(content)
+        if (matches.count() < 1) return emptySequence()
+
+        val rlis = matches.map { this.buildRli(it) }.filterNotNull()
+        if (rlis.count() < 1) Report.upToDateFile(this)
+        return rlis
+    }
 
     /** Dissects the [result] struct from the Regex match */
     private fun buildRli(result: MatchResult): LocatedRli? {
@@ -54,7 +60,10 @@ class RliFile(private val file: File) {
     }
 
     override fun toString(): String = file.toRelativeString(Constants.root)
-    operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
+    override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
+    override fun equals(other: Any?): Boolean = if (other is RliFile) {
+        this.file == other.file
+    } else false
 }
 
 /**

@@ -4,6 +4,7 @@ import io.starlight.env.Output
 import java.util.*
 
 object Report {
+    private val upToDateFiles = LinkedList<RliFile>()
     private val upToDate = LinkedList<Triple<String, LineRange, Location>>()
     private val outdated = LinkedList<LocatedRli>()
     private val invalid = LinkedList<Pair<Location, String>>()
@@ -15,9 +16,17 @@ object Report {
         loc1.compareTo(loc2)
     }
 
+    /** Report a whole file as up-to-date */
+    fun upToDateFile(file: RliFile) {
+        upToDateFiles.push(file)
+        upToDate.removeAll { (_, _, loc) -> loc.file == file }
+    }
+
     /** Report an RLI as up-to-date */
-    fun upToDate(url: String, lines: LineRange, loc: Location) =
-        upToDate.push(Triple(url, lines, loc))
+    fun upToDate(url: String, lines: LineRange, loc: Location) = if (loc.file in upToDateFiles) Unit else {
+        val triple = Triple(url, lines, loc)
+        if (triple !in upToDate) upToDate.push(triple) else Unit
+    }
 
     /** Report an RLI as outdated and automatically fixed */
     fun outdated(rli: Rli, location: Location): Unit = outdated.push(location to rli)
@@ -48,6 +57,7 @@ object Report {
     |<details>
     |
     |```
+    |${upToDateFiles.sorted().joinToString("\n") { "ALL @ <$it>" }}
     |${upToDate.sortedWith(locationComparator{it.third}).joinToString("\n") { (url, lines, loc) -> "${url}#${lines} @ <${loc.file}:${loc.line}>" }}
     |```
     |
