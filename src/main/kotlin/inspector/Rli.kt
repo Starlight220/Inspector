@@ -1,7 +1,5 @@
 package io.starlight.inspector
 
-import java.net.URL
-
 data class Location(val file: RliFile, val indexRange: IntRange) {
     fun compareTo(other: Location): Int {
         return this.file.compareTo(other.file).takeUnless { it == 0 }
@@ -18,15 +16,8 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
 }
 
 data class Rli(val version: String, val url: String, val lines: LineRange) {
-    val versionedUrl: String = """$version/$url"""
     val fullUrl: String = """${Constants.baseUrl}$version/$url"""
-    val response: String by lazy {
-        URL(fullUrl)
-            .readText()
-            .lineSequence()
-            .filterIndexed { i, _ -> i + 1 in lines }
-            .joinToString(separator = "\n")
-    }
+    val response: String by lazy { RemoteCache[fullUrl, lines] }
     val withLatest by lazy { copy(version = Constants.latestVersion) }
 }
 
