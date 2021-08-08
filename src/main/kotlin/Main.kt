@@ -1,7 +1,6 @@
 package io.starlight.inspector
 
 import com.github.starlight220.actions.Environment
-import java.io.File
 import kotlin.streams.asSequence
 
 fun main() {
@@ -18,7 +17,7 @@ fun main() {
                 - else, require manual attention (**invalid**)
      */
     Constants.root
-        .walkDir { extension == "rst" }
+        .walkDir { extension == "rst" && !isIgnored(env.ignoredFiles)}
         .map { it.findRlis() }
         .asSequence()
         .flatMap { seq -> seq.map { it.status } }

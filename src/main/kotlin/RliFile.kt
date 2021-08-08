@@ -4,6 +4,8 @@ import java.io.File
 import java.util.HashSet
 import java.util.stream.Stream
 
+fun File.normalized(root: File) = this.toRelativeString(root).replace('\\', '/')
+
 /** Represents a file that contains RLIs. */
 class RliFile(private val file: File) : Comparable<RliFile> {
     private var content: String = file.readText()
@@ -74,3 +76,7 @@ class RliFile(private val file: File) : Comparable<RliFile> {
  */
 fun File.walkDir(predicate: File.() -> Boolean): Stream<RliFile> =
     walk().filterTo(HashSet(), predicate).parallelStream().map(::RliFile)
+
+fun File.isSubpath(str: String) = normalized(Constants.root).startsWith(str)
+
+fun File.isIgnored(ignored: Collection<String>) = ignored.firstOrNull { this.isSubpath(it) } != null

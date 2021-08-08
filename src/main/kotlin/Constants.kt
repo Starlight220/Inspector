@@ -60,4 +60,5 @@ internal data class InspectorEnv(
     @JvmField val versionScheme: String,
     @JvmField val baseUrl: String,
     @JvmField val latestVersion: String,
+    @JvmField val ignoredFiles: Set<String> = emptySet()
 ) : Environment
