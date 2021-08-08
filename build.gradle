@@ -22,9 +22,9 @@ boolean isCI() {
 }
 
 run.doFirst {
-    if (isCI()) return
-
-    environment 'INSPECTOR_CONFIG', 'inputs.inspector.json'
+    if (!isCI()) {
+        environment 'INSPECTOR_CONFIG', 'inputs.inspector.json'
+    }
 }
 
 spotless {
