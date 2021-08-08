@@ -22,9 +22,8 @@ boolean isCI() {
 }
 
 run.doFirst {
-    if (!isCI()) {
-        environment 'INSPECTOR_CONFIG', 'inputs.inspector.json'
-    }
+    println "Setting local path!"
+    environment 'INSPECTOR_CONFIG', '.github/workflows/inputs.inspector.json'
 }
 
 spotless {

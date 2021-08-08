@@ -4,6 +4,7 @@ import com.github.starlight220.actions.Environment
 import kotlin.streams.asSequence
 
 fun main() {
+    println("config: ${System.getenv("INSPECTOR_CONFIG")}")
     val env = Environment.loadFrom<InspectorEnv>("INSPECTOR_CONFIG")
     /*
     Process:

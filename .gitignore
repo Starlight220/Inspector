@@ -6,6 +6,6 @@ build/
 /report.md
 *.inspect_rli.json # same here
 *.tmp
-/inputs.inspector.json
+*/inputs.inspector.json
 /outputs.inspector.json
 /outputs.actions.json
