@@ -18,12 +18,18 @@ dependencies {
 }
 
 boolean isCI() {
-    return (project.hasProperty("CI") && project.property("CI") == true)
+    return (project.hasProperty("CI"))
 }
 
-run.doFirst {
-    println "Setting local path!"
-    environment 'INSPECTOR_CONFIG', '.github/workflows/inputs.inspector.json'
+if (!isCI()) {
+    task runLocal() {
+        doFirst {
+            println "Setting local path!"
+            environment 'INSPECTOR_CONFIG', '.github/workflows/inspector.json'
+        }
+
+        dependsOn 'run'
+    }
 }
 
 spotless {
