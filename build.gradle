@@ -7,14 +7,29 @@ plugins {
 
 application.mainClassName = 'io.starlight.inspector.MainKt'
 repositories {
+    mavenLocal()
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
+    implementation 'com.github.Starlight220:ActionsKtLib:v1.01'
+}
+
+boolean isCI() {
+    return (project.hasProperty("CI") && project.property("CI") == true)
+}
+
+run.doFirst {
+    if (isCI()) return
+
+    environment 'INSPECTOR_CONFIG', 'inputs.inspector.json'
 }
 
 spotless {
+    enforceCheck !isCI()
+
     kotlin {
         ktfmt('0.25').kotlinlangStyle()
         endWithNewline()

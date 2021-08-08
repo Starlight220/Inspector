@@ -1,14 +1,16 @@
 package io.starlight.inspector
 
-import io.starlight.env.Input
+import com.github.starlight220.actions.Environment
+import com.github.starlight220.actions.Input
+import kotlinx.serialization.Serializable
 import java.io.File
 
 private const val reportFilePath = "report.md"
 private const val oldTmpFilePath = "old.tmp"
 private const val newTmpFilePath = "new.tmp"
 
-private const val rliHeaderRegex = """\.\. (?:rli)|(?:remoteliteralinclude)::"""
-private const val rliLinesRegex = """\r?\n[ ]*:lines: (\d*-\d*)"""
+private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
+private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
 /** Constants Namespace */
 object Constants {
@@ -34,7 +36,7 @@ object Constants {
 
     val rliRegex by lazy {
         val r =
-            """$rliHeaderRegex ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/([/\w.]+)\r?\n.*$rliLinesRegex""".toRegex()
+            """$RLI_HEADER_REGEX ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/([/\w.]+)\r?\n.*$RLI_LINES_REGEX""".toRegex()
         println(r)
         r
     }
@@ -42,12 +44,20 @@ object Constants {
     override fun toString(): String {
         return """
       $root
-      $reportFilePath     
-      $rliHeaderRegex
+      $reportFilePath
+      $RLI_HEADER_REGEX
       $baseUrl
       $versionScheme
-      $rliLinesRegex
+      $RLI_LINES_REGEX
       ${rliRegex.pattern}
         """.trimIndent()
     }
 }
+
+@Serializable
+internal data class InspectorEnv(
+    @JvmField val root: String,
+    @JvmField val versionScheme: String,
+    @JvmField val baseUrl: String,
+    @JvmField val latestVersion: String,
+) : Environment

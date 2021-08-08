@@ -1,8 +1,11 @@
 package io.starlight.inspector
 
+import com.github.starlight220.actions.Environment
+import java.io.File
 import kotlin.streams.asSequence
 
 fun main() {
+    Environment<InspectorEnv>(File(System.getenv("INSPECTOR_CONFIG")).readText())
     /*
     Process:
     1. Recursively walk files; for each file:

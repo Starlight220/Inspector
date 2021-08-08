@@ -1,6 +1,6 @@
 package io.starlight.inspector
 
-import io.starlight.env.Output
+import com.github.starlight220.actions.Output
 import java.util.*
 
 object Report {
