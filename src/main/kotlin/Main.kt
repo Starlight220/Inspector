@@ -5,7 +5,7 @@ import java.io.File
 import kotlin.streams.asSequence
 
 fun main() {
-    Environment<InspectorEnv>(File(System.getenv("INSPECTOR_CONFIG")).readText())
+    val env = Environment.loadFrom<InspectorEnv>("INSPECTOR_CONFIG")
     /*
     Process:
     1. Recursively walk files; for each file:
