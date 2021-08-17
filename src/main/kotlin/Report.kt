@@ -91,9 +91,14 @@ object Report {
         val _needsManual = invalid.isNotEmpty()
         needsManual = _needsManual
         isUpToDate = !_needsManual && outdated.isEmpty()
-        reportFilePath = Constants.reportFile.canonicalPath
         report = toString()
-        Constants.reportFile.writeText(report)
-        println(report)
+
+        with(Constants.reportFile){
+            println("Overwritten report: ${createNewFile()}")
+            reportFilePath = path
+            writeText(report)
+
+            println("Wrote `${readText()}` to `$canonicalPath`")
+        }
     }
 }
