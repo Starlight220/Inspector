@@ -95,7 +95,7 @@ object Report {
 
         with(Constants.reportFile){
             println("Overwritten report: ${createNewFile()}")
-            reportFilePath = path
+            reportFilePath = canonicalPath
             writeText(report)
 
             println("Wrote `${readText()}` to `$canonicalPath`")
