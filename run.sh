@@ -9,4 +9,9 @@ echo "INPUT_BASEURL=$INPUT_BASEURL)"
 echo "INPUT_LATESTVERSION=$INPUT_LATESTVERSION)"
 echo "GITHUB_WORKSPACE=$GITHUB_WORKSPACE)"
 
-/inspector/gradlew run -q
+echo 'REPORT<<EOF' >> $GITHUB_ENV
+OUTPUT="$(/inspector/gradlew run -q)"
+echo "$OUTPUT" >> $GITHUB_ENV
+echo 'EOF' >> $GITHUB_ENV
+
+echo "$OUTPUT"
