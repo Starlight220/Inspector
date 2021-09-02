@@ -1,4 +1,4 @@
-name: InspectRLIs
+name: Inspector
 description: Updates all outdated RLIs in the Sphinx project.
 runs:
   using: 'docker'
@@ -8,15 +8,6 @@ inputs:
     description: 'Root Directory of Sphinx project'
     required: true
     default: '$GITHUB_WORKSPACE'
-  latestVersion:
-    description: 'Version of RLIs to enforce'
-    required: true
-  baseUrl:
-    description: 'Base URL of all RLIs'
-    required: true
-  versionScheme:
-    description: 'A regex that all RLI versions match'
-    required: true
 outputs:
   report:
     description: 'Full Report; written to the `report.md` file, console, and this output.'
