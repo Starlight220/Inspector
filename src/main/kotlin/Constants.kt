@@ -2,8 +2,8 @@ package io.starlight.inspector
 
 import com.github.starlight220.actions.Environment
 import com.github.starlight220.actions.Input
-import kotlinx.serialization.Serializable
 import java.io.File
+import kotlinx.serialization.Serializable
 
 private const val reportFilePath = "report.md"
 private const val oldTmpFilePath = "old.tmp"

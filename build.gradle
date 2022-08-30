@@ -5,7 +5,7 @@ plugins {
     id "com.diffplug.spotless" version "5.12.5"
 }
 
-application.mainClassName = 'io.starlight.inspector.MainKt'
+application.mainClass.set('io.starlight.inspector.MainKt')
 repositories {
     mavenLocal()
     mavenCentral()
@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
-    implementation 'com.github.Starlight220:ActionsKtLib:f97605c7ec'
+    implementation 'com.github.Starlight220:ActionsKtLib:083b60cf7c'
 }
 
 boolean isCI() {

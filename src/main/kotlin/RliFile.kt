@@ -63,9 +63,10 @@ class RliFile(private val file: File) : Comparable<RliFile> {
 
     override fun toString(): String = file.toRelativeString(Constants.root)
     override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
-    override fun equals(other: Any?): Boolean = if (other is RliFile) {
-        this.file == other.file
-    } else false
+    override fun equals(other: Any?): Boolean =
+        if (other is RliFile) {
+            this.file == other.file
+        } else false
 }
 
 /**

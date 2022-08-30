@@ -23,10 +23,12 @@ object Report {
     }
 
     /** Report an RLI as up-to-date */
-    fun upToDate(url: String, lines: LineRange, loc: Location) = if (loc.file in upToDateFiles) Unit else {
-        val triple = Triple(url, lines, loc)
-        if (triple !in upToDate) upToDate.push(triple) else Unit
-    }
+    fun upToDate(url: String, lines: LineRange, loc: Location) =
+        if (loc.file in upToDateFiles) Unit
+        else {
+            val triple = Triple(url, lines, loc)
+            if (triple !in upToDate) upToDate.push(triple) else Unit
+        }
 
     /** Report an RLI as outdated and automatically fixed */
     fun outdated(rli: Rli, location: Location): Unit = outdated.push(location to rli)
@@ -93,7 +95,7 @@ object Report {
         isUpToDate = !_needsManual && outdated.isEmpty()
         report = toString()
 
-        with(Constants.reportFile){
+        with(Constants.reportFile) {
             println("Overwritten report: ${createNewFile()}")
             reportFilePath = canonicalPath
             writeText(report)
