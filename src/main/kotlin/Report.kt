@@ -1,6 +1,7 @@
 package io.starlight.inspector
 
 import com.github.starlight220.actions.Output
+import com.github.starlight220.actions.raw.setSummary
 import java.util.*
 
 object Report {
@@ -90,15 +91,18 @@ object Report {
     private var reportFilePath by Output<String>("report-file-path")
     private var report by Output
     operator fun invoke() {
-        val _needsManual = invalid.isNotEmpty()
-        needsManual = _needsManual
-        isUpToDate = !_needsManual && outdated.isEmpty()
-        report = toString()
+        invalid.isNotEmpty().also {
+            needsManual = it
+            isUpToDate = !it && outdated.isEmpty()
+        }
+        val markdown = toString()
+        report = markdown
+        setSummary(markdown)
 
         with(Constants.reportFile) {
             println("Overwritten report: ${createNewFile()}")
             reportFilePath = canonicalPath
-            writeText(report)
+            writeText(markdown)
 
             println("Wrote `${readText()}` to `$canonicalPath`")
         }

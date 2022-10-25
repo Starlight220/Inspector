@@ -8,6 +8,19 @@ inputs:
     description: 'Root Directory of Sphinx project'
     required: true
     default: '$GITHUB_WORKSPACE'
+  baseUrl:
+    description: 'Base URL of RLIs'
+    required: true
+  ignoredFiles:
+    description: 'Files to ignore'
+    required: false
+    default: '[]'
+  latestVersion:
+    description: 'Version to update RLIs to'
+    required: true
+  versionScheme:
+    description: 'A regex of the version strings'
+    required: true
 outputs:
   report:
     description: 'Full Report; written to the `report.md` file, console, and this output.'
