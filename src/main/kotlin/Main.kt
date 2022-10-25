@@ -1,11 +1,8 @@
 package io.starlight.inspector
 
-import com.github.starlight220.actions.Environment
 import kotlin.streams.asSequence
 
 fun main() {
-    println("config: ${System.getenv("INSPECTOR_CONFIG")}")
-    val env = Environment.loadFrom<InspectorEnv>("INSPECTOR_CONFIG")
     /*
     Process:
     1. Recursively walk files; for each file:
@@ -18,7 +15,7 @@ fun main() {
                 - else, require manual attention (**invalid**)
      */
     Constants.root
-        .walkDir { extension == "rst" && !isIgnored(env.ignoredFiles) }
+        .walkDir { extension == "rst" && !isIgnored(Constants.ignoredFiles) }
         .map { it.findRlis() }
         .asSequence()
         .flatMap { seq -> seq.map { it.status } }

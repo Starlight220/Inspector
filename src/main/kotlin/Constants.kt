@@ -1,9 +1,9 @@
 package io.starlight.inspector
 
-import com.github.starlight220.actions.Environment
 import com.github.starlight220.actions.Input
 import java.io.File
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 private const val reportFilePath = "report.md"
 private const val oldTmpFilePath = "old.tmp"
@@ -20,13 +20,15 @@ object Constants {
     val newTmpFile = File(newTmpFilePath)
 
     /** Search root for RLI files */
-    val root by Input(mapper = ::File)
+    val root by Input("root", mapper = ::File)
+
+    val ignoredFiles by Input<List<String>>("ignoredFiles") { Json.decodeFromString(it) }
 
     const val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
     val diffSplitRegex = """@@ [-]?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
     /** Base URL for all RLIs. Contains terminating `/`. */
-    val baseUrl by Input { str -> if (str.endsWith('/')) str else "$str/" }
+    val baseUrl by Input("baseUrl") { str -> if (str.endsWith('/')) str else "$str/" }
 
     /** Version Regex */
     val versionScheme by Input
@@ -53,12 +55,3 @@ object Constants {
         """.trimIndent()
     }
 }
-
-@Serializable
-internal data class InspectorEnv(
-    @JvmField val root: String,
-    @JvmField val versionScheme: String,
-    @JvmField val baseUrl: String,
-    @JvmField val latestVersion: String,
-    @JvmField val ignoredFiles: Set<String> = emptySet()
-) : Environment

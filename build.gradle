@@ -1,7 +1,7 @@
 plugins {
     id 'application'
-    id 'org.jetbrains.kotlin.jvm' version '1.5.0'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.0'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.7.20'
     id "com.diffplug.spotless" version "5.12.5"
 }
 
@@ -13,8 +13,8 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1"
-    implementation 'com.github.Starlight220:ActionsKtLib:083b60cf7c'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+    implementation 'com.github.Starlight220:ActionsKtLib:74d69457b8'
 }
 
 boolean isCI() {
