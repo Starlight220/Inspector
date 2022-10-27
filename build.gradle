@@ -14,7 +14,7 @@ repositories {
 
 dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
-    implementation 'com.github.Starlight220:ActionsKtLib:v2'
+    implementation 'com.github.Starlight220:ActionsKtLib:v2.1'
 }
 
 boolean isCI() {
