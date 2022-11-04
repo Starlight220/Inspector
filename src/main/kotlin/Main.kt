@@ -1,8 +1,18 @@
 package io.starlight.inspector
 
+import com.github.starlight220.actions.raw.getEnvOrNull
+import java.io.File
 import kotlin.streams.asSequence
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 fun main() {
+    Constants =
+        getEnvOrNull("INSPECTOR_CONFIG")?.let(::File)?.let {
+            Json.decodeFromString<ConstantSet.JsonConstants>(it.readText())
+        }
+            ?: ConstantSet.InputConstants()
+
     /*
     Process:
     1. Recursively walk files; for each file:

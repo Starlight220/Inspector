@@ -1,7 +1,9 @@
-FROM wpilib/ubuntu-base:18.04
+FROM wpilib/ubuntu-base:22.04
+
+RUN chmod +x /inspector/gradlew
+RUN ./gradlew jar
 
 COPY . /inspector/
 RUN chmod +x /inspector/run.sh
-RUN chmod +x /inspector/gradlew
 
 ENTRYPOINT ["/inspector/run.sh"]

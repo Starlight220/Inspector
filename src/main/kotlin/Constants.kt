@@ -12,8 +12,27 @@ private const val newTmpFilePath = "new.tmp"
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
 private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
+lateinit var Constants: ConstantSet
+
 /** Constants Namespace */
-object Constants {
+sealed class ConstantSet {
+    class InputConstants : ConstantSet() {
+        override val ignoredFiles by Input<List<String>>("ignoredFiles") {
+            Json.decodeFromString(it)
+        }
+        override val baseUrl by Input("baseUrl") { str -> if (str.endsWith('/')) str else "$str/" }
+        override val latestVersion: String by Input
+        override val versionScheme: String by Input
+    }
+
+    @Serializable
+    data class JsonConstants(
+        override val baseUrl: String,
+        override val versionScheme: String,
+        override val latestVersion: String,
+        override val ignoredFiles: List<String>
+    ) : ConstantSet()
+
     // files
     val reportFile = File(reportFilePath)
     val oldTmpFile = File(oldTmpFilePath)
@@ -22,19 +41,19 @@ object Constants {
     /** Search root for RLI files */
     val root by Input("root", mapper = ::File)
 
-    val ignoredFiles by Input<List<String>>("ignoredFiles") { Json.decodeFromString(it) }
+    abstract val ignoredFiles: List<String>
 
-    const val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
+    val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
     val diffSplitRegex = """@@ [-]?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
     /** Base URL for all RLIs. Contains terminating `/`. */
-    val baseUrl by Input("baseUrl") { str -> if (str.endsWith('/')) str else "$str/" }
+    abstract val baseUrl: String
 
     /** Version Regex */
-    val versionScheme by Input
+    abstract val versionScheme: String
 
     /** Latest Version */
-    val latestVersion by Input
+    abstract val latestVersion: String
 
     val rliRegex by lazy {
         val r =

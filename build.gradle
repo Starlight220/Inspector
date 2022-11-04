@@ -5,7 +5,9 @@ plugins {
     id "com.diffplug.spotless" version "5.12.5"
 }
 
-application.mainClass.set('io.starlight.inspector.MainKt')
+
+final MAIN_CLASS = 'io.starlight.inspector.MainKt'
+application.mainClass.set(MAIN_CLASS)
 repositories {
     mavenLocal()
     mavenCentral()
@@ -51,4 +53,12 @@ task cleanup(type: Delete) {
     delete 'old.tmp'
 
     tasks.named('run').get() dependsOn 'cleanup'
+}
+
+tasks.jar {
+    manifest.attributes["Main-Class"] = MAIN_CLASS
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = 'EXCLUDE'
 }
