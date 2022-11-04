@@ -1,6 +1,6 @@
 FROM wpilib/ubuntu-base:22.04
 
-RUN chmod +x /inspector/gradlew
+RUN chmod +x ./gradlew
 RUN ./gradlew jar
 
 COPY . /inspector/
