@@ -8,9 +8,9 @@ import kotlinx.serialization.json.Json
 
 fun main() {
     Constants =
-        getEnvOrNull("INSPECTOR_CONFIG")?.let(::File)?.let {
-            Json.decodeFromString<ConstantSet.JsonConstants>(it.readText())
-        }
+        getEnvOrNull("INSPECTOR_CONFIG")
+            ?.let { File(getEnvOrNull("GITHUB_WORKSPACE") ?: "", it) }
+            ?.let { Json.decodeFromString<ConstantSet.JsonConstants>(it.readText()) }
             ?: ConstantSet.InputConstants()
 
     /*
