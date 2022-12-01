@@ -7,7 +7,7 @@ import java.util.*
 
 object Report {
     private val upToDateFiles = LinkedList<RliFile>()
-    private val upToDate = LinkedList<Triple<String, LineRange, Location>>()
+    private val upToDate = LinkedList<LocatedRli>()
     private val outdated = LinkedList<LocatedRli>()
     private val invalid = LinkedList<Pair<Location, String>>()
 
@@ -18,19 +18,11 @@ object Report {
         loc1.compareTo(loc2)
     }
 
-    /** Report a whole file as up-to-date */
-    fun upToDateFile(file: RliFile) {
-        upToDateFiles.push(file)
-        upToDate.removeAll { (_, _, loc) -> loc.file == file }
-    }
-
     /** Report an RLI as up-to-date */
-    fun upToDate(url: String, lines: LineRange, loc: Location) =
-        if (loc.file in upToDateFiles) Unit
-        else {
-            val triple = Triple(url, lines, loc)
-            if (triple !in upToDate) upToDate.push(triple) else Unit
-        }
+    fun upToDate(locatedRli: LocatedRli) {
+        if (locatedRli.location.file in upToDateFiles) return
+        if (locatedRli !in upToDate) upToDate.push(locatedRli)
+    }
 
     /** Report an RLI as outdated and automatically fixed */
     fun outdated(rli: Rli, location: Location): Unit = outdated.push(LocatedRli(location, rli))
@@ -41,7 +33,7 @@ object Report {
             invalid.push(
                 location to
                     """
-                |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <${location.file}:${location.line}>
+                |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <$location>
                 |```diff
                 |${diff.buildDiffBlock()}
                 |```
@@ -62,7 +54,7 @@ object Report {
     |
     |```
     |${upToDateFiles.sorted().joinToString("\n") { "ALL @ <$it>" }}
-    |${upToDate.sortedWith(locationComparator{it.third}).joinToString("\n") { (url, lines, loc) -> "${url}#${lines} @ <${loc.file}:${loc.line}>" }}
+    |${upToDate.sortedWith(locationComparator{it.location}).joinToString("\n") { (loc, rli) -> "${rli.url}#${rli.lines} @ <$loc>" }}
     |```
     |
     |</details>
@@ -72,7 +64,7 @@ object Report {
     |<details>
     |
     |```
-    |${outdated.sortedWith(locationComparator { it.location }).joinToString("\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <${location.file}:${location.line}>"}}
+    |${outdated.sortedWith(locationComparator { it.location }).joinToString("\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <$location>"}}
     |```
     |
     |</details>
@@ -87,6 +79,18 @@ object Report {
     |
   """.trimMargin()
 
+    private fun reduceUpToDateFiles() {
+        buildSet { upToDate.forEach { upToDateRli -> add(upToDateRli.location.file) } }
+            .filter { rliFile ->
+                outdated.none { (location, _) -> rliFile == location.file } &&
+                    invalid.none { (location, _) -> rliFile == location.file }
+            }
+            .forEach {
+                upToDateFiles.push(it)
+                upToDate.removeAll { (loc, _) -> loc.file == it }
+            }
+    }
+
     private var needsManual by Output<Boolean>("needs-manual")
     private var isUpToDate by Output<Boolean>("up-to-date")
     private var reportFilePath by Output<String>("report-file-path")
@@ -95,6 +99,8 @@ object Report {
     private const val REPORT_FILE_PATH = "report.md"
 
     operator fun invoke() {
+        reduceUpToDateFiles()
+
         invalid.isNotEmpty().also {
             needsManual = it
             isUpToDate = !it && outdated.isEmpty()
