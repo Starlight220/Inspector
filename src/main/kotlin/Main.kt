@@ -28,7 +28,7 @@ fun main() {
         .walkDir { extension == "rst" && !isIgnored(Constants.ignoredFiles) }
         .map { it.findRlis() }
         .asSequence()
-        .flatMap { seq -> seq.map { it.status } }
+        .flatMap { seq -> seq.map { it.toStatus() } }
         .forEach { it() }
 
     Report()

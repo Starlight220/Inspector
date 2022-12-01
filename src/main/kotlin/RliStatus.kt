@@ -1,9 +1,16 @@
 package io.starlight.inspector
 
-sealed class RliStatus(val rli: Rli, val location: Location) {
-    constructor(base: LocatedRli) : this(base.rli, base.location)
+sealed class RliStatus(protected val base: LocatedRli) {
+    val rli: Rli by base::rli
+    val location: Location by base::location
 
-    class Valid(base: LocatedRli) : RliStatus(base) {
+    class UpToDate(base: LocatedRli) : RliStatus(base) {
+        override fun invoke() {
+            Report.upToDate(base)
+        }
+    }
+
+    class Outdated(base: LocatedRli) : RliStatus(base) {
         override fun invoke() {
             Report.outdated(rli, location)
             location.file.replaceRange(location.indexRange, Constants.latestVersion)
@@ -19,13 +26,13 @@ sealed class RliStatus(val rli: Rli, val location: Location) {
     abstract operator fun invoke()
 }
 
-val LocatedRli.status: RliStatus
-    get() =
-        with(rli) {
-            val diff = this diff this.withLatest
-            if (diff == null) {
-                RliStatus.Valid(this@status)
-            } else {
-                RliStatus.Invalid(this@status, diff)
-            }
-        }
+fun LocatedRli.toStatus(): RliStatus {
+    if (rli.version == Constants.latestVersion) {
+        return RliStatus.UpToDate(this)
+    }
+    val latest = rli.copy(version = Constants.latestVersion)
+    if (rli.response == latest.response) {
+        return RliStatus.Outdated(this)
+    }
+    return RliStatus.Invalid(this, Diff(old = this.rli, new = latest))
+}

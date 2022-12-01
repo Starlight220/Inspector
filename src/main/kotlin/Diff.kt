@@ -4,9 +4,6 @@ import java.io.File
 
 data class Diff(val old: Rli, val new: Rli)
 
-infix fun Rli.diff(other: Rli): Diff? =
-    if (this.response != other.response) Diff(this, other) else null
-
 private const val GIT_DIFF_CMD = "git diff --no-index --no-prefix -U200 --"
 private val diffSplitRegex: Regex = """@@ -?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
@@ -22,8 +19,8 @@ fun Diff.buildDiffBlock(): String {
             writeText(new.response + "\n")
         }
 
-    val oldLine = old.lines.iter()
-    val newLine = new.lines.iter()
+    val oldLine = old.lines.iterator()
+    val newLine = new.lines.iterator()
 
     return Runtime.getRuntime()
         .exec("$GIT_DIFF_CMD ${oldFile.canonicalPath} ${newFile.canonicalPath}")

@@ -8,11 +8,9 @@ sealed class LineRange {
     abstract override fun toString(): String
 
     /**
-     * An endless iterator over the RLId lines
+     * An iterator over the RLId lines
      */
-    fun iter() : LinesIterator = LinesIterator(iterator())
-
-    protected abstract fun iterator() : IntIterator
+    abstract fun iterator() : IntIterator
 
     /**
      * Both edges are specified, and are different
@@ -123,18 +121,6 @@ sealed class LineRange {
     }
 }
 
-class LinesIterator(private val iter: IntIterator) {
-    private var dragged: Int = -1
-
-    operator fun invoke(): String {
-        if (iter.hasNext()) {
-            val taken = iter.next()
-            if (iter.hasNext()) {
-                dragged = taken
-            }
-            return " $taken "
-        } else {
-            return "(${dragged++})"
-        }
-    }
+operator fun IntIterator.invoke(): String {
+    return nextInt().toString()
 }

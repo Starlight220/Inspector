@@ -38,30 +38,22 @@ class RliFile(private val file: File) : Comparable<RliFile> {
         val matches = Constants.rliRegex.findAll(content)
         if (matches.count() < 1) return emptySequence()
 
-        val rlis = matches.map { this.buildRli(it) }.filterNotNull()
-        if (rlis.count() < 1) Report.upToDateFile(this)
-        return rlis
+        return matches.map { buildRli(it) }
     }
 
     /** Dissects the [result] struct from the Regex match */
-    private fun buildRli(result: MatchResult): LocatedRli? {
+    private fun buildRli(result: MatchResult): LocatedRli {
         // sanity check to make sure that there isn't any funny business going on
         require(result.value matches Constants.rliRegex)
         // index of RLI URL in file
-        val idxRange = result.groups[1]?.range ?: IntRange.EMPTY
+        val idxRange = result.groups[1]?.range ?: error("Empty regex match range!\t$result")
         // (RLI version, RLI URL, RLI line range)
         val (version, url, _lines) = result.destructured
         val lines = LineRange(_lines)
-        val loc = Location(this, idxRange)
-        if (version == Constants.latestVersion) {
-            // if the RLI is up-to-date, no need to waste time on it
-            Report.upToDate(url, lines, loc)
-            return null
-        }
-        return LocatedRli(loc, Rli(version, url, lines))
+        return LocatedRli(Location(this, idxRange), Rli(version, url, lines))
     }
 
-    override fun toString(): String = file.toRelativeString(Constants.root)
+    override fun toString(): String = file.toRelativeString(Constants.root).replace('\\', '/')
     override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
     override fun equals(other: Any?): Boolean =
         if (other is RliFile) {

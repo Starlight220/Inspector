@@ -1,5 +1,6 @@
 package io.starlight.inspector
 
+/** The RLI's location. */
 data class Location(val file: RliFile, val indexRange: IntRange) {
     fun compareTo(other: Location): Int {
         return this.file.compareTo(other.file).takeUnless { it == 0 }
@@ -8,6 +9,7 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
 
     override fun equals(other: Any?): Boolean = other is Location && this.compareTo(other) == 0
     override fun hashCode(): Int = 31 * file.hashCode() + indexRange.hashCode()
+    override fun toString(): String = "$file:$line"
 
     val line by lazy {
         file.use {
@@ -18,6 +20,13 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
     }
 }
 
+/**
+ * RLI data.
+ *
+ * @param version the version of this RLI's content
+ * @param url the RLI source
+ * @param lines the RLId lines from the source
+ */
 data class Rli(val version: String, val url: String, val lines: LineRange) {
     val fullUrl: String = """${Constants.baseUrl}$version/$url"""
     val response: String by lazy { RemoteCache[fullUrl, lines] }
