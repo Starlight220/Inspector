@@ -1,5 +1,7 @@
 package io.starlight.inspector
 
+import java.io.File
+
 @JvmInline
 value class Diff(private val diff: Pair<Rli, Rli>) {
     val old
@@ -15,8 +17,16 @@ infix fun Rli.diff(other: Rli): Diff? =
     if (this.response != other.response) Diff(this to other) else null
 
 fun buildDiffBlock(diff: Diff): String {
-    Constants.oldTmpFile.writeText(diff.old.response + "\n")
-    Constants.newTmpFile.writeText(diff.new.response + "\n")
+    val oldFile =
+        File.createTempFile("old", ".tmp").apply {
+            deleteOnExit()
+            writeText(diff.old.response + "\n")
+        }
+    val newFile =
+        File.createTempFile("new", ".tmp").apply {
+            deleteOnExit()
+            writeText(diff.new.response + "\n")
+        }
 
     var oldLine = diff.old.lines.start
     var newLine = diff.new.lines.start
@@ -34,9 +44,7 @@ fun buildDiffBlock(diff: Diff): String {
         }
 
     return Runtime.getRuntime()
-        .exec(
-            Constants.run { "$diffCommand ${oldTmpFile.canonicalPath} ${newTmpFile.canonicalPath}" }
-        )
+        .exec("${Constants.diffCommand} ${oldFile.canonicalPath} ${newFile.canonicalPath}")
         .inputStream
         .bufferedReader()
         .readText()

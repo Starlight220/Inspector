@@ -6,8 +6,6 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 private const val reportFilePath = "report.md"
-private const val oldTmpFilePath = "old.tmp"
-private const val newTmpFilePath = "new.tmp"
 
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
 private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: (\d*-\d*)"""
@@ -35,8 +33,6 @@ sealed class ConstantSet {
 
     // files
     val reportFile = File(reportFilePath)
-    val oldTmpFile = File(oldTmpFilePath)
-    val newTmpFile = File(newTmpFilePath)
 
     /** Search root for RLI files */
     val root by Input("root", mapper = ::File)
