@@ -7,6 +7,9 @@ data class Diff(val old: Rli, val new: Rli)
 infix fun Rli.diff(other: Rli): Diff? =
     if (this.response != other.response) Diff(this, other) else null
 
+private const val GIT_DIFF_CMD = "git diff --no-index --no-prefix -U200 --"
+private val diffSplitRegex: Regex = """@@ -?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
+
 fun buildDiffBlock(diff: Diff): String {
     val oldFile =
         File.createTempFile("old", ".tmp").apply {
@@ -35,11 +38,11 @@ fun buildDiffBlock(diff: Diff): String {
         }
 
     return Runtime.getRuntime()
-        .exec("${Constants.diffCommand} ${oldFile.canonicalPath} ${newFile.canonicalPath}")
+        .exec("$GIT_DIFF_CMD ${oldFile.canonicalPath} ${newFile.canonicalPath}")
         .inputStream
         .bufferedReader()
         .readText()
-        .split(Constants.diffSplitRegex)
+        .split(diffSplitRegex)
         .asSequence()
         .drop(1) // drop header
         .flatMap { it.lineSequence() }
