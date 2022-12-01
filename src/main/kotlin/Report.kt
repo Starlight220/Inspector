@@ -43,7 +43,7 @@ object Report {
                     """
                 |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <${location.file}:${location.line}>
                 |```diff
-                |${buildDiffBlock(diff)}
+                |${diff.buildDiffBlock()}
                 |```
                 |
             """.trimMargin()

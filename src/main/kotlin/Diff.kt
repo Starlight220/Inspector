@@ -10,32 +10,20 @@ infix fun Rli.diff(other: Rli): Diff? =
 private const val GIT_DIFF_CMD = "git diff --no-index --no-prefix -U200 --"
 private val diffSplitRegex: Regex = """@@ -?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
-fun buildDiffBlock(diff: Diff): String {
+fun Diff.buildDiffBlock(): String {
     val oldFile =
         File.createTempFile("old", ".tmp").apply {
             deleteOnExit()
-            writeText(diff.old.response + "\n")
+            writeText(old.response + "\n")
         }
     val newFile =
         File.createTempFile("new", ".tmp").apply {
             deleteOnExit()
-            writeText(diff.new.response + "\n")
+            writeText(new.response + "\n")
         }
 
-    var oldLine = diff.old.lines.start
-    var newLine = diff.new.lines.start
-
-    fun processLine(line: String): String? =
-        when (line[0]) {
-            '+' -> line.replaceFirst("+", "+\t \t${newLine++}\t")
-            '-' -> line.replaceFirst("-", "-\t${oldLine++}\t \t")
-            ' ' -> line.replaceFirst(" ", " \t${oldLine++}\t${newLine++}\t")
-            '\\' -> null
-            else ->
-                error(
-                    "Git Diff output line should not start with something other than `+`, `-`, ` `, or `\\`.\nGot:$line"
-                )
-        }
+    val oldLine = old.lines.iter()
+    val newLine = new.lines.iter()
 
     return Runtime.getRuntime()
         .exec("$GIT_DIFF_CMD ${oldFile.canonicalPath} ${newFile.canonicalPath}")
@@ -47,7 +35,18 @@ fun buildDiffBlock(diff: Diff): String {
         .drop(1) // drop header
         .flatMap { it.lineSequence() }
         .filter { it.isNotEmpty() }
-        .map { processLine(it) }
+        .map {
+            when (it[0]) {
+                '+' -> it.replaceFirst("+", "+\t \t${newLine()}\t")
+                '-' -> it.replaceFirst("-", "-\t${oldLine()}\t \t")
+                ' ' -> it.replaceFirst(" ", " \t${oldLine()}\t${newLine()}\t")
+                '\\' -> null
+                else ->
+                    error(
+                        "Git Diff output line should not start with something other than `+`, `-`, ` `, or `\\`.\nGot:$it"
+                    )
+            }
+        }
         .filterNot { it.isNullOrEmpty() }
         .joinToString("\n")
 }

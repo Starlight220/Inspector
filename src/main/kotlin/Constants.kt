@@ -6,7 +6,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
-private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: (\d*-\d*)"""
+private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: ((?:\d*-\d*(?:,[ ]?)?)+)"""
 
 lateinit var Constants: ConstantSet
 
