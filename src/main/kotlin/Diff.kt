@@ -2,19 +2,10 @@ package io.starlight.inspector
 
 import java.io.File
 
-@JvmInline
-value class Diff(private val diff: Pair<Rli, Rli>) {
-    val old
-        get() = diff.first
-    val new
-        get() = diff.second
-
-    operator fun component1() = old
-    operator fun component2() = new
-}
+data class Diff(val old: Rli, val new: Rli)
 
 infix fun Rli.diff(other: Rli): Diff? =
-    if (this.response != other.response) Diff(this to other) else null
+    if (this.response != other.response) Diff(this, other) else null
 
 fun buildDiffBlock(diff: Diff): String {
     val oldFile =
