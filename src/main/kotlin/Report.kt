@@ -33,7 +33,7 @@ object Report {
         }
 
     /** Report an RLI as outdated and automatically fixed */
-    fun outdated(rli: Rli, location: Location): Unit = outdated.push(location to rli)
+    fun outdated(rli: Rli, location: Location): Unit = outdated.push(LocatedRli(location, rli))
 
     /** Report an RLI as invalid and requires manual attention */
     fun invalid(obj: RliStatus.Invalid) =
@@ -72,7 +72,7 @@ object Report {
     |<details>
     |
     |```
-    |${outdated.sortedWith(locationComparator { it.first }).joinToString("\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <${location.file}:${location.line}>"}}
+    |${outdated.sortedWith(locationComparator { it.location }).joinToString("\n") { (location, rli) -> "${rli.url}#${rli.lines} @ <${location.file}:${location.line}>"}}
     |```
     |
     |</details>

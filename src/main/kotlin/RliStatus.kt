@@ -1,7 +1,7 @@
 package io.starlight.inspector
 
 sealed class RliStatus(val rli: Rli, val location: Location) {
-    constructor(base: LocatedRli) : this(base.second, base.first)
+    constructor(base: LocatedRli) : this(base.rli, base.location)
 
     class Valid(base: LocatedRli) : RliStatus(base) {
         override fun invoke() {
@@ -21,7 +21,7 @@ sealed class RliStatus(val rli: Rli, val location: Location) {
 
 val LocatedRli.status: RliStatus
     get() =
-        with(second) {
+        with(rli) {
             val diff = this diff this.withLatest
             if (diff == null) {
                 RliStatus.Valid(this@status)

@@ -58,7 +58,7 @@ class RliFile(private val file: File) : Comparable<RliFile> {
             Report.upToDate(url, lines, loc)
             return null
         }
-        return loc to Rli(version, url, lines)
+        return LocatedRli(loc, Rli(version, url, lines))
     }
 
     override fun toString(): String = file.toRelativeString(Constants.root)

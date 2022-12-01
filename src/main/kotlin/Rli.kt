@@ -24,4 +24,4 @@ data class Rli(val version: String, val url: String, val lines: LineRange) {
     val withLatest by lazy { copy(version = Constants.latestVersion) }
 }
 
-typealias LocatedRli = Pair<Location, Rli>
+data class LocatedRli(val location: Location, val rli: Rli)
