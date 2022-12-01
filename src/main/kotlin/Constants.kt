@@ -5,8 +5,6 @@ import java.io.File
 import kotlinx.serialization.*
 import kotlinx.serialization.json.*
 
-private const val reportFilePath = "report.md"
-
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
 private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: (\d*-\d*)"""
 
@@ -31,16 +29,10 @@ sealed class ConstantSet {
         override val ignoredFiles: List<String>
     ) : ConstantSet()
 
-    // files
-    val reportFile = File(reportFilePath)
-
     /** Search root for RLI files */
     val root by Input("root", mapper = ::File)
 
     abstract val ignoredFiles: List<String>
-
-    val diffCommand: String = "git diff --no-index --no-prefix -U200 -- "
-    val diffSplitRegex = """@@ [-]?\d+,?\d* [+]?\d+,?\d* @@""".toRegex()
 
     /** Base URL for all RLIs. Contains terminating `/`. */
     abstract val baseUrl: String
@@ -61,7 +53,6 @@ sealed class ConstantSet {
     override fun toString(): String {
         return """
       $root
-      $reportFilePath
       $RLI_HEADER_REGEX
       $baseUrl
       $versionScheme
