@@ -6,17 +6,23 @@ package io.starlight.inspector
 sealed class LineRange {
     abstract operator fun contains(e: Int): Boolean
     abstract override fun toString(): String
-    abstract val start: Int
+
+    /**
+     * An endless iterator over the RLId lines
+     */
+    fun iter() : LinesIterator = LinesIterator(iterator())
+
+    protected abstract fun iterator() : IntIterator
 
     /**
      * Both edges are specified, and are different
      */
-    protected class RangedLineRange(private val range: IntRange) : LineRange() {
+    protected class RangedLineRange(internal val range: IntRange) : LineRange() {
         override fun contains(e: Int): Boolean = e in range
         override fun toString(): String = "L${range.first}-L${range.last}"
         override fun equals(other: Any?): Boolean = other is RangedLineRange && this.range == other.range
         override fun hashCode(): Int = range.hashCode()
-        override val start: Int by range::first
+        override fun iterator(): IntIterator = range.iterator()
     }
 
     /**
@@ -30,7 +36,27 @@ sealed class LineRange {
         override fun toString(): String = "L$element"
         override fun equals(other: Any?): Boolean = other is SingletonLineRange && this.element == other.element
         override fun hashCode(): Int = Integer.hashCode(element)
-        override val start: Int by ::element
+        override fun iterator(): IntIterator {
+            return object : IntIterator() {
+                var hasNext = true
+
+                /**
+                 * Returns `true` if the iteration has more elements.
+                 */
+                override fun hasNext(): Boolean = hasNext
+
+                /** Returns the next value in the sequence without boxing. */
+                override fun nextInt(): Int {
+                    if (hasNext) {
+                        hasNext = false
+                        return element
+                    } else {
+                        throw NoSuchElementException("Singleton iterator called more than once")
+                    }
+                }
+
+            }
+        }
     }
 
     /**
@@ -41,25 +67,74 @@ sealed class LineRange {
      *      :lines: 20-
      * ```
      */
-    protected class LowerBoundedLineRange(override val start: Int) : LineRange() {
+    protected class LowerBoundedLineRange(val start: Int) : LineRange() {
         override fun contains(e: Int): Boolean = start <= e
         override fun toString(): String = "L$start-EOF"
         override fun equals(other: Any?): Boolean = other is LowerBoundedLineRange && this.start == other.start
         override fun hashCode(): Int = Integer.hashCode(start)
+        override fun iterator(): IntIterator {
+            return object : IntIterator() {
+                var next = start
+                override fun hasNext(): Boolean = true
+                override fun nextInt(): Int = next++
+            }
+        }
+    }
+
+    protected class MultiLineRange(private val ranges: List<IntRange>) : LineRange() {
+        private val flattened: List<Int> by lazy { ranges.flatten() }
+        override fun contains(e: Int): Boolean = flattened.contains(e)
+
+        override fun toString(): String = ranges.joinToString(separator = ",") { "L${it.first}-L${it.last}" }
+
+        override fun iterator(): IntIterator {
+            return object : IntIterator() {
+                val iter = flattened.iterator()
+                override fun hasNext(): Boolean = iter.hasNext()
+
+                override fun nextInt(): Int = iter.next()
+            }
+        }
 
     }
 
     companion object {
-        operator fun invoke(s: String): LineRange =
-            with(s) {
-                val parts = this.split('-')
-                check(parts.size == 2) { "error in parsing numbers: `$this`" }
+        operator fun invoke(s: String): LineRange {
+            if (!s.contains(",")) {
+                val parts = s.split('-')
+                check(parts.size == 2) { "error in parsing numbers: `$s`" }
                 if (parts[1].isBlank()) {
-                    return@with LowerBoundedLineRange(parts[0].toInt())
+                    return LowerBoundedLineRange(parts[0].toInt())
                 }
                 val start = parts[0].toInt()
                 val end = parts[1].toInt()
                 return if (start == end) SingletonLineRange(start) else RangedLineRange(start..end)
+            } else {
+                s.split(",").map { untrimmed ->
+                    val it = untrimmed.trim()
+                    val parts = it.split('-')
+                    check(parts.size == 2) { "error in parsing numbers: `$it`" }
+                    val start = parts[0].toInt()
+                    val end = parts[1].toInt()
+                    start..end
+                }.let { return MultiLineRange(it) }
             }
+        }
+    }
+}
+
+class LinesIterator(private val iter: IntIterator) {
+    private var dragged: Int = -1
+
+    operator fun invoke(): String {
+        if (iter.hasNext()) {
+            val taken = iter.next()
+            if (iter.hasNext()) {
+                dragged = taken
+            }
+            return " $taken "
+        } else {
+            return "(${dragged++})"
+        }
     }
 }
