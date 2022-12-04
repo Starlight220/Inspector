@@ -27,10 +27,11 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
  * @param url the RLI source
  * @param lines the RLId lines from the source
  */
-data class Rli(val version: String, val url: String, val lines: LineRange) {
-    val fullUrl: String = """${Constants.baseUrl}$version/$url"""
+//context(RliContext) // https://youtrack.jetbrains.com/issue/KT-55261/Data-class-with-context-receiver-fails
+data class Rli(val version: String, val url: String, val lines: LineRange, private val context: RliSet) {
+    val fullUrl: String = """${context.baseUrl}$version/$url"""
     val response: String by lazy { RemoteCache[fullUrl, lines] }
-    val withLatest by lazy { copy(version = Constants.latestVersion) }
+    val withLatest by lazy { copy(version = context.latestVersion) }
 }
 
 data class LocatedRli(val location: Location, val rli: Rli)
