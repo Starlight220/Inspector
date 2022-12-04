@@ -10,10 +10,10 @@ sealed class RliStatus(protected val base: LocatedRli) {
         }
     }
 
-    class Outdated(base: LocatedRli) : RliStatus(base) {
+    class Outdated(base: LocatedRli, private val latestVersion: String) : RliStatus(base) {
         override fun invoke() {
             Report.outdated(rli, location)
-            location.file.replaceRange(location.indexRange, Constants.latestVersion)
+            location.file.replaceRange(location.indexRange, latestVersion)
         }
     }
 
@@ -26,13 +26,14 @@ sealed class RliStatus(protected val base: LocatedRli) {
     abstract operator fun invoke()
 }
 
+context(RliContext)
 fun LocatedRli.toStatus(): RliStatus {
-    if (rli.version == Constants.latestVersion) {
+    if (rli.version == context.latestVersion) {
         return RliStatus.UpToDate(this)
     }
-    val latest = rli.copy(version = Constants.latestVersion)
+    val latest = rli.copy(version = context.latestVersion)
     if (rli.response == latest.response) {
-        return RliStatus.Outdated(this)
+        return RliStatus.Outdated(this, context.latestVersion)
     }
     return RliStatus.Invalid(this, Diff(old = this.rli, new = latest))
 }

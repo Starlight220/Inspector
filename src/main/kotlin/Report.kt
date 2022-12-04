@@ -33,7 +33,7 @@ object Report {
             invalid.push(
                 location to
                     """
-                |> [${Constants.latestVersion} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <$location>
+                |> [${diff.new.version} |](${diff.old.withLatest.fullUrl}) [${diff.old.version}/${diff.old.url}#${diff.old.lines}](${diff.old.fullUrl}) @ <$location>
                 |```diff
                 |${diff.buildDiffBlock()}
                 |```

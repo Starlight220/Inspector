@@ -1,12 +1,9 @@
 package io.starlight.inspector
 
 import java.io.File
-import java.util.HashSet
-import java.util.stream.Stream
-
-fun File.normalized(root: File) = this.toRelativeString(root).replace('\\', '/')
 
 /** Represents a file that contains RLIs. */
+context(EnvContext)
 class RliFile(private val file: File) : Comparable<RliFile> {
     private var content: String = file.readText()
     private var offset: Int = 0
@@ -33,27 +30,33 @@ class RliFile(private val file: File) : Comparable<RliFile> {
      */
     fun <R> use(const: (String) -> R) = const(content)
 
+    val isIgnored by lazy { context.ignoredFiles.any {
+        file.toRelativeString(context.root).replace('\\', '/').startsWith(it)
+    } }
+
     /** Returns a [Sequence] of RLIs in this file */
+    context(RliContext)
     fun findRlis(): Sequence<LocatedRli> {
-        val matches = Constants.rliRegex.findAll(content)
+        val matches = context.rliRegex.findAll(content)
         if (matches.count() < 1) return emptySequence()
 
         return matches.map { buildRli(it) }
     }
 
     /** Dissects the [result] struct from the Regex match */
+    context(RliContext)
     private fun buildRli(result: MatchResult): LocatedRli {
         // sanity check to make sure that there isn't any funny business going on
-        require(result.value matches Constants.rliRegex)
+        require(result.value matches context.rliRegex)
         // index of RLI URL in file
         val idxRange = result.groups[1]?.range ?: error("Empty regex match range!\t$result")
         // (RLI version, RLI URL, RLI line range)
         val (version, url, _lines) = result.destructured
         val lines = LineRange(_lines)
-        return LocatedRli(Location(this, idxRange), Rli(version, url, lines))
+        return LocatedRli(Location(this, idxRange), Rli(version, url, lines, context))
     }
 
-    override fun toString(): String = file.toRelativeString(Constants.root).replace('\\', '/')
+    override fun toString(): String = file.toRelativeString(context.root).replace('\\', '/')
     override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
     override fun equals(other: Any?): Boolean =
         if (other is RliFile) {
@@ -67,9 +70,5 @@ class RliFile(private val file: File) : Comparable<RliFile> {
  * Searches recursively for files.
  * @see walk
  */
-fun File.walkDir(predicate: File.() -> Boolean): Stream<RliFile> =
-    walk().filterTo(HashSet(), predicate).parallelStream().map(::RliFile)
-
-fun File.isSubpath(str: String) = normalized(Constants.root).startsWith(str)
-
-fun File.isIgnored(ignored: Collection<String>) = ignored.firstOrNull { this.isSubpath(it) } != null
+fun File.walkDir(predicate: (File) -> Boolean): Sequence<File> =
+    walk().filter(predicate)
