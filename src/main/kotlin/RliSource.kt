@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
 private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: ((?:\d*-\d*(?:,[ ]?)?)+)"""
+private const val RLI_PATH_REGEX = """([^\s]+)"""
 
 class RliContext(val context: RliSet)
 
@@ -14,7 +15,7 @@ inline fun <T> Sequence<RliSet>.asEachContext(crossinline action: context(RliCon
 data class RliSet(val baseUrl: String, val versionScheme: String, val latestVersion: String) {
     val rliRegex by lazy {
         val r =
-            """$RLI_HEADER_REGEX ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/([/\w.]+)\r?\n.*$RLI_LINES_REGEX""".toRegex()
+            """$RLI_HEADER_REGEX ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/$RLI_PATH_REGEX\r?\n.*$RLI_LINES_REGEX""".toRegex()
         println(r)
         r
     }
