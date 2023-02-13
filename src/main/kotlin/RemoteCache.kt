@@ -1,5 +1,7 @@
 package io.starlight.inspector
 
+import com.github.starlight220.actions.debug
+import java.io.FileNotFoundException
 import java.net.URL
 
 /**
@@ -11,7 +13,14 @@ import java.net.URL
 object RemoteCache {
     private val map: MutableMap<String, String> = mutableMapOf()
 
-    operator fun get(url: String): String = map.getOrPut(url) { URL(url).readText() }
+    operator fun get(url: String): String = map.getOrPut(url) {
+        try {
+            URL(url).readText()
+        } catch (e: FileNotFoundException) {
+            debug("Remote resource not found for URL `${url}`: ${e.message}")
+            ""
+        }
+    }
     operator fun get(url: String, lines: LineRange): String =
         this[url]
             .lineSequence()
