@@ -3,7 +3,7 @@ package io.starlight.inspector
 import kotlinx.serialization.Serializable
 
 private const val RLI_HEADER_REGEX = """\.\. (?:rli|remoteliteralinclude)::"""
-private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: ((?:\d*-\d*(?:,[ ]?)?)+)"""
+private const val RLI_LINES_REGEX = """\r?\n[ ]*:lines: ((?:[ ]?\d+(?:-\d*,?)?)*)"""
 private const val RLI_PATH_REGEX = """([^\s]+)"""
 
 class RliContext(val context: RliSet)
