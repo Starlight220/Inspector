@@ -100,8 +100,7 @@ sealed class LineRange {
         operator fun invoke(s: String): LineRange {
             if (!s.contains(",")) {
                 val parts = s.split('-')
-                check(parts.size == 2) { "error in parsing numbers: `$s`" }
-                if (parts[1].isBlank()) {
+                if (parts.size == 1 || parts[1].isBlank()) {
                     return LowerBoundedLineRange(parts[0].toInt())
                 }
                 val start = parts[0].toInt()
