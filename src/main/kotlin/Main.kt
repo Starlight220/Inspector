@@ -32,7 +32,7 @@ fun main() {
  * Read from config JSON if it exists, otherwise read from inputs.
  */
 private fun getEnv(): EnvSet = getEnvOrNull("INSPECTOR_CONFIG")
-    ?.let { File(getEnvOrNull("GITHUB_WORKSPACE") ?: "", it) }
+    ?.let { File(getEnvOrNull("GITHUB_WORKSPACE"), it) }
     ?.let { Json.decodeFromString<EnvSet>(it.readText()) }
     ?: EnvSet.fromInputs()
 
