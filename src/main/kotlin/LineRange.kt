@@ -3,14 +3,14 @@ package io.starlight.inspector
 /**
  * Represents the line range of an RLI, fetched from the remote.
  */
-sealed class LineRange {
+sealed class LineRange : Iterable<Int> {
     abstract operator fun contains(e: Int): Boolean
     abstract override fun toString(): String
 
     /**
      * An iterator over the RLId lines
      */
-    abstract fun iterator() : IntIterator
+    abstract override fun iterator(): IntIterator
 
     /**
      * Both edges are specified, and are different
@@ -79,11 +79,11 @@ sealed class LineRange {
         }
     }
 
-    protected class MultiLineRange(private val ranges: List<IntRange>) : LineRange() {
+    protected class MultiLineRange(private val ranges: List<LineRange>) : LineRange() {
         private val flattened: List<Int> by lazy { ranges.flatten() }
         override fun contains(e: Int): Boolean = flattened.contains(e)
 
-        override fun toString(): String = ranges.joinToString(separator = ",") { "L${it.first}-L${it.last}" }
+        override fun toString(): String = ranges.joinToString(separator = ",", transform = LineRange::toString)
 
         override fun iterator(): IntIterator {
             return object : IntIterator() {
@@ -98,27 +98,23 @@ sealed class LineRange {
 
     companion object {
         operator fun invoke(s: String): LineRange {
-            if (!s.contains(",")) {
-                val parts = s.split('-')
-                if (parts.size == 1) {
-                    return SingletonLineRange(parts[0].toInt())
-                }
-                if (parts[1].isBlank()) {
-                    return LowerBoundedLineRange(parts[0].toInt())
-                }
-                val start = parts[0].toInt()
-                val end = parts[1].toInt()
-                return if (start == end) SingletonLineRange(start) else RangedLineRange(start..end)
-            } else {
-                s.split(",").map { untrimmed ->
-                    val it = untrimmed.trim()
-                    val parts = it.split('-')
-                    check(parts.size == 2) { "error in parsing numbers: `$it`" }
-                    val start = parts[0].toInt()
-                    val end = parts[1].toInt()
-                    start..end
-                }.let { return MultiLineRange(it) }
+            // If the line spec is a complex one, parse it recursively
+            if (s.contains(",")) {
+                return MultiLineRange(s.split(",").map {
+                    invoke(it.trim())
+                })
             }
+            val parts = s.split('-')
+            if (parts.size == 1) {
+                return SingletonLineRange(parts[0].toInt())
+            }
+            check(parts.size == 2) { "error in parsing numbers: `$s`" }
+            if (parts[1].isBlank()) {
+                return LowerBoundedLineRange(parts[0].toInt())
+            }
+            val start = parts[0].toInt()
+            val end = parts[1].toInt()
+            return if (start == end) SingletonLineRange(start) else RangedLineRange(start..end)
         }
     }
 }
