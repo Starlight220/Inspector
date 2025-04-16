@@ -40,7 +40,7 @@ private fun getEnv(): EnvSet = getEnvOrNull("INSPECTOR_CONFIG")
  * Iterate over files.
  */
 context(EnvContext)
-private fun fileWalk(): Sequence<File> = context.root.walkDir { it.extension == "rst" }
+private fun fileWalk(): Sequence<File> = context.root.walkDir { it.extension == "rst" || it.extension == "md" }
 
 /**
  * Convert the file walk to RliFile objects.
