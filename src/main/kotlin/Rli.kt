@@ -8,7 +8,9 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
     }
 
     override fun equals(other: Any?): Boolean = other is Location && this.compareTo(other) == 0
+
     override fun hashCode(): Int = 31 * file.hashCode() + indexRange.hashCode()
+
     override fun toString(): String = "$file:$line"
 
     val line by lazy {
@@ -27,8 +29,14 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
  * @param url the RLI source
  * @param lines the RLId lines from the source
  */
-//context(RliContext) // https://youtrack.jetbrains.com/issue/KT-55261/Data-class-with-context-receiver-fails
-data class Rli(val version: String, val url: String, val lines: LineRange, private val context: RliSet) {
+// context(RliContext) //
+// https://youtrack.jetbrains.com/issue/KT-55261/Data-class-with-context-receiver-fails
+data class Rli(
+    val version: String,
+    val url: String,
+    val lines: LineRange,
+    private val context: RliSet
+) {
     val fullUrl: String = """${context.baseUrl}$version/$url"""
     val response: String by lazy { RemoteCache[fullUrl, lines] }
     val withLatest by lazy { copy(version = context.latestVersion) }

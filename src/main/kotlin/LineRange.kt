@@ -1,46 +1,50 @@
 package io.starlight.inspector
 
-/**
- * Represents the line range of an RLI, fetched from the remote.
- */
+/** Represents the line range of an RLI, fetched from the remote. */
 sealed class LineRange : Iterable<Int> {
     abstract operator fun contains(e: Int): Boolean
+
     abstract override fun toString(): String
 
-    /**
-     * An iterator over the RLId lines
-     */
+    /** An iterator over the RLId lines */
     abstract override fun iterator(): IntIterator
 
-    /**
-     * Both edges are specified, and are different
-     */
+    /** Both edges are specified, and are different */
     protected class RangedLineRange(internal val range: IntRange) : LineRange() {
         override fun contains(e: Int): Boolean = e in range
+
         override fun toString(): String = "L${range.first}-L${range.last}"
-        override fun equals(other: Any?): Boolean = other is RangedLineRange && this.range == other.range
+
+        override fun equals(other: Any?): Boolean =
+            other is RangedLineRange && this.range == other.range
+
         override fun hashCode(): Int = range.hashCode()
+
         override fun iterator(): IntIterator = range.iterator()
     }
 
     /**
      * The RLI only includes one line, indicated by
+     *
      * ```rst
      *      :lines: 10-10
      * ```
      */
     protected class SingletonLineRange(private val element: Int) : LineRange() {
         override fun contains(e: Int): Boolean = element == e
+
         override fun toString(): String = "L$element"
-        override fun equals(other: Any?): Boolean = other is SingletonLineRange && this.element == other.element
+
+        override fun equals(other: Any?): Boolean =
+            other is SingletonLineRange && this.element == other.element
+
         override fun hashCode(): Int = Integer.hashCode(element)
+
         override fun iterator(): IntIterator {
             return object : IntIterator() {
                 var hasNext = true
 
-                /**
-                 * Returns `true` if the iteration has more elements.
-                 */
+                /** Returns `true` if the iteration has more elements. */
                 override fun hasNext(): Boolean = hasNext
 
                 /** Returns the next value in the sequence without boxing. */
@@ -52,7 +56,6 @@ sealed class LineRange : Iterable<Int> {
                         throw NoSuchElementException("Singleton iterator called more than once")
                     }
                 }
-
             }
         }
     }
@@ -67,13 +70,20 @@ sealed class LineRange : Iterable<Int> {
      */
     protected class LowerBoundedLineRange(val start: Int) : LineRange() {
         override fun contains(e: Int): Boolean = start <= e
+
         override fun toString(): String = "L$start-EOF"
-        override fun equals(other: Any?): Boolean = other is LowerBoundedLineRange && this.start == other.start
+
+        override fun equals(other: Any?): Boolean =
+            other is LowerBoundedLineRange && this.start == other.start
+
         override fun hashCode(): Int = Integer.hashCode(start)
+
         override fun iterator(): IntIterator {
             return object : IntIterator() {
                 var next = start
+
                 override fun hasNext(): Boolean = true
+
                 override fun nextInt(): Int = next++
             }
         }
@@ -81,28 +91,28 @@ sealed class LineRange : Iterable<Int> {
 
     protected class MultiLineRange(private val ranges: List<LineRange>) : LineRange() {
         private val flattened: List<Int> by lazy { ranges.flatten() }
+
         override fun contains(e: Int): Boolean = flattened.contains(e)
 
-        override fun toString(): String = ranges.joinToString(separator = ",", transform = LineRange::toString)
+        override fun toString(): String =
+            ranges.joinToString(separator = ",", transform = LineRange::toString)
 
         override fun iterator(): IntIterator {
             return object : IntIterator() {
                 val iter = flattened.iterator()
+
                 override fun hasNext(): Boolean = iter.hasNext()
 
                 override fun nextInt(): Int = iter.next()
             }
         }
-
     }
 
     companion object {
         operator fun invoke(s: String): LineRange {
             // If the line spec is a complex one, parse it recursively
             if (s.contains(",")) {
-                return MultiLineRange(s.split(",").map {
-                    invoke(it.trim())
-                })
+                return MultiLineRange(s.split(",").map { invoke(it.trim()) })
             }
             val parts = s.split('-')
             if (parts.size == 1) {
