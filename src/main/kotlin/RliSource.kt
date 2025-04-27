@@ -8,14 +8,24 @@ private const val RLI_PATH_REGEX = """([^\s]+)"""
 
 class RliContext(val context: RliSet)
 
-inline fun <T> RliSet.asContext(action: context(RliContext) () -> T) = with(RliContext(this), action)
-inline fun <T> Sequence<RliSet>.asEachContext(crossinline action: context(RliContext) () -> Sequence<T>): Sequence<T> = this.flatMap { it.asContext(action) }
+inline fun <T> RliSet.asContext(
+    action:
+        context(RliContext)
+        () -> T
+) = with(RliContext(this), action)
+
+inline fun <T> Sequence<RliSet>.asEachContext(
+    crossinline action:
+        context(RliContext)
+        () -> Sequence<T>
+): Sequence<T> = this.flatMap { it.asContext(action) }
 
 @Serializable
 data class RliSet(val baseUrl: String, val versionScheme: String, val latestVersion: String) {
     val rliRegex by lazy {
         val r =
-            """$RLI_HEADER_REGEX ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/$RLI_PATH_REGEX\r?\n.*$RLI_LINES_REGEX""".toRegex()
+            """$RLI_HEADER_REGEX ${Regex.fromLiteral(baseUrl).pattern}($versionScheme)/$RLI_PATH_REGEX\r?\n.*$RLI_LINES_REGEX"""
+                .toRegex()
         println(r)
         r
     }

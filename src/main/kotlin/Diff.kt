@@ -40,8 +40,7 @@ fun Diff.buildDiffBlock(): String {
                 '\\' -> null
                 else ->
                     error(
-                        "Git Diff output line should not start with something other than `+`, `-`, ` `, or `\\`.\nGot:$it"
-                    )
+                        "Git Diff output line should not start with something other than `+`, `-`, ` `, or `\\`.\nGot:$it")
             }
         }
         .filterNot { it.isNullOrEmpty() }

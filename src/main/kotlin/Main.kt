@@ -17,54 +17,45 @@ fun main() {
                 - if identical, autofix (**outdated**)
                 - else, require manual attention (**invalid**)
      */
-    getEnv().also { println(it) }.asContext {
-        val rliFiles: Sequence<RliFile> = fileWalk().toRliFileWalk()
-        context.sources.asSequence().asEachContext {
-            rliFiles.filesToRlis()
-                .rliToStatus()
-        }.apply()
+    getEnv()
+        .also { println(it) }
+        .asContext {
+            val rliFiles: Sequence<RliFile> = fileWalk().toRliFileWalk()
+            context.sources
+                .asSequence()
+                .asEachContext { rliFiles.filesToRlis().rliToStatus() }
+                .apply()
 
-        Report()
-    }
+            Report()
+        }
 }
 
-/**
- * Read from config JSON if it exists, otherwise read from inputs.
- */
-private fun getEnv(): EnvSet = getEnvOrNull("INSPECTOR_CONFIG")
-    ?.let { File(getEnvOrNull("GITHUB_WORKSPACE"), it) }
-    ?.let { Json.decodeFromString<EnvSet>(it.readText()) }
-    ?: EnvSet.fromInputs()
+/** Read from config JSON if it exists, otherwise read from inputs. */
+private fun getEnv(): EnvSet =
+    getEnvOrNull("INSPECTOR_CONFIG")
+        ?.let { File(getEnvOrNull("GITHUB_WORKSPACE"), it) }
+        ?.let { Json.decodeFromString<EnvSet>(it.readText()) } ?: EnvSet.fromInputs()
 
-/**
- * Iterate over files.
- */
+/** Iterate over files. */
 context(EnvContext)
-private fun fileWalk(): Sequence<File> = context.root.walkDir { it.extension == "rst" || it.extension == "md" }
+private fun fileWalk(): Sequence<File> =
+    context.root.walkDir { it.extension == "rst" || it.extension == "md" }
 
-/**
- * Convert the file walk to RliFile objects.
- */
+/** Convert the file walk to RliFile objects. */
 context(EnvContext)
-private fun Sequence<File>.toRliFileWalk(): Sequence<RliFile> = map { RliFile(it) }
-    .filter { !it.isIgnored }
+private fun Sequence<File>.toRliFileWalk(): Sequence<RliFile> =
+    map { RliFile(it) }.filter { !it.isIgnored }
 
-/**
- * Scan files for RLIs.
- */
+/** Scan files for RLIs. */
 context(RliContext)
 private fun Sequence<RliFile>.filesToRlis(): Sequence<LocatedRli> = flatMap { file ->
     file.findRlis()
 }
 
-/**
- * Check status of each RLI.
- */
+/** Check status of each RLI. */
 context(RliContext)
 private fun Sequence<LocatedRli>.rliToStatus(): Sequence<RliStatus> = this.map { it.toStatus() }
 
-/**
- * Apply/report RLI status.
- */
+/** Apply/report RLI status. */
 context(EnvContext)
 private fun Sequence<RliStatus>.apply(): Unit = forEach { it() }

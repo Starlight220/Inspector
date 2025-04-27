@@ -30,9 +30,11 @@ class RliFile(private val file: File) : Comparable<RliFile> {
      */
     fun <R> use(const: (String) -> R) = const(content)
 
-    val isIgnored by lazy { context.ignoredFiles.any {
-        file.toRelativeString(context.root).replace('\\', '/').startsWith(it)
-    } }
+    val isIgnored by lazy {
+        context.ignoredFiles.any {
+            file.toRelativeString(context.root).replace('\\', '/').startsWith(it)
+        }
+    }
 
     /** Returns a [Sequence] of RLIs in this file */
     context(RliContext)
@@ -57,7 +59,9 @@ class RliFile(private val file: File) : Comparable<RliFile> {
     }
 
     override fun toString(): String = file.toRelativeString(context.root).replace('\\', '/')
+
     override operator fun compareTo(other: RliFile): Int = this.file.compareTo(other.file)
+
     override fun equals(other: Any?): Boolean =
         if (other is RliFile) {
             this.file == other.file
@@ -68,7 +72,7 @@ class RliFile(private val file: File) : Comparable<RliFile> {
  * Return a [Sequence] of all files that match the given [predicate].
  *
  * Searches recursively for files.
+ *
  * @see walk
  */
-fun File.walkDir(predicate: (File) -> Boolean): Sequence<File> =
-    walk().filter(predicate)
+fun File.walkDir(predicate: (File) -> Boolean): Sequence<File> = walk().filter(predicate)

@@ -12,11 +12,11 @@ object Report {
     private val invalid = LinkedList<Pair<Location, String>>()
 
     private inline fun <T> locationComparator(crossinline mapper: (T) -> Location): Comparator<T> =
-            Comparator { first, second ->
-        val loc1 = mapper(first)
-        val loc2 = mapper(second)
-        loc1.compareTo(loc2)
-    }
+        Comparator { first, second ->
+            val loc1 = mapper(first)
+            val loc2 = mapper(second)
+            loc1.compareTo(loc2)
+        }
 
     /** Report an RLI as up-to-date */
     fun upToDate(locatedRli: LocatedRli) {
@@ -38,8 +38,8 @@ object Report {
                 |${diff.buildDiffBlock()}
                 |```
                 |
-            """.trimMargin()
-            )
+            """
+                        .trimMargin())
         }
 
     override fun toString(): String =
@@ -77,7 +77,8 @@ object Report {
     |
     |</details>
     |
-  """.trimMargin()
+  """
+            .trimMargin()
 
     private fun reduceUpToDateFiles() {
         buildSet { upToDate.forEach { upToDateRli -> add(upToDateRli.location.file) } }
