@@ -13,13 +13,12 @@ data class Location(val file: RliFile, val indexRange: IntRange) {
 
     override fun toString(): String = "$file:$line"
 
-    val line by lazy {
+    val line =
         file.use {
             var counter = 1
             repeat(indexRange.first) { i -> if (it[i] == '\n') counter++ }
             counter
         }
-    }
 }
 
 /**
