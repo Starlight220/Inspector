@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 cd /inspector/
 echo "$(pwd -P)"

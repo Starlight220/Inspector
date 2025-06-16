@@ -1,10 +1,12 @@
-FROM wpilib/ubuntu-base:22.04 as builder
+FROM alpine/java:17 as builder
 
 COPY . /inspector/
 RUN cd /inspector/ && ./gradlew --no-daemon jar
 
 
-FROM wpilib/ubuntu-base:22.04
+FROM alpine/java:17
+
+RUN apk --no-cache add git
 
 COPY --from=builder /inspector/build/libs/Inspector.jar /inspector/build/libs/Inspector.jar
 
