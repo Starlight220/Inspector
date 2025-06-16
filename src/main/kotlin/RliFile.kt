@@ -66,6 +66,10 @@ class RliFile(private val file: File) : Comparable<RliFile> {
         if (other is RliFile) {
             this.file == other.file
         } else false
+
+    override fun hashCode(): Int {
+        return toString().hashCode()
+    }
 }
 
 /**

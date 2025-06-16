@@ -6,7 +6,7 @@ import java.io.File
 import java.util.*
 
 object Report {
-    private val upToDateFiles = LinkedList<RliFile>()
+    private val upToDateFiles = mutableSetOf<RliFile>()
     private val upToDate = LinkedList<LocatedRli>()
     private val outdated = LinkedList<LocatedRli>()
     private val invalid = LinkedList<Pair<Location, String>>()
@@ -87,7 +87,7 @@ object Report {
                     invalid.none { (location, _) -> rliFile == location.file }
             }
             .forEach {
-                upToDateFiles.push(it)
+                upToDateFiles.add(it)
                 upToDate.removeAll { (loc, _) -> loc.file == it }
             }
     }
