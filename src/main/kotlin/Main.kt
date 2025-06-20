@@ -25,6 +25,8 @@ fun main() {
             context.sources
                 .asSequence()
                 .asEachContext { rliFiles.filesToRlis().rliToStatus() }
+                .toList() // Eagerly evaluate everything before fixing
+                .asSequence()
                 .apply()
 
             Report()
