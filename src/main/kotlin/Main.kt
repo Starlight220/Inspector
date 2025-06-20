@@ -1,5 +1,6 @@
 package io.starlight.inspector
 
+import com.github.starlight220.actions.debug
 import com.github.starlight220.actions.raw.getEnvOrNull
 import java.io.File
 import kotlinx.serialization.decodeFromString
@@ -49,6 +50,7 @@ private fun Sequence<File>.toRliFileWalk(): Sequence<RliFile> =
 /** Scan files for RLIs. */
 context(RliContext)
 private fun Sequence<RliFile>.filesToRlis(): Sequence<LocatedRli> = flatMap { file ->
+    debug("Processing file $file...")
     file.findRlis()
 }
 

@@ -1,6 +1,5 @@
 package io.starlight.inspector
 
-import com.github.starlight220.actions.debug
 import java.io.FileNotFoundException
 import java.net.URL
 
@@ -18,7 +17,7 @@ object RemoteCache {
             try {
                 URL(url).readText()
             } catch (e: FileNotFoundException) {
-                debug("Remote resource not found for URL `${url}`: ${e.message}")
+                System.err.println("Remote resource not found for URL `${url}`: ${e.message}")
                 ""
             }
         }
